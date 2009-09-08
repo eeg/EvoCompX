@@ -1,0 +1,8 @@
+cd src/
+make
+	creates compete executable
+cd ../input/
+./make_initial.py
+	creates num.in and zbar.in
+../src/compete params.in
+	creates num1.dat, num2.dat, zbar1.dat, zbar2.dat, final.dat, time.dat
