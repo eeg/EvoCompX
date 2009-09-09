@@ -1,22 +1,11 @@
 /***
-  * local adaptation
   * keep track of numbers and mean phenotypes of each of two species
+  * local adaptation
   * density dependent growth (equal intra- and inter-specific competition)
-  *
-  * no dispersal barriers
-  *
   * one-dimensional space
   * discrete time
-  * allow fancy dispersal kernels (may be different for the two species)
-  *
-  *** kernel file should look something like this:
-	  note: odd number of lines, sums to zero
-		0.1
-		0.2
-		-0.4	it's now okay to put any number here; normalization is automatic
-		0.1
-		0.0
-	  indicates proportion of this cell added to neighboring cells (or subtracted from own)
+  * nearest-neighbor dispersal (though could be repeated within a generation)
+  * no dispersal barriers
 ***/
 
 
@@ -34,32 +23,9 @@
 
 int main(int argc, char *argv[])
 {
-
-/* might want to alter these */
-
-	const int MAX_KERN_WIDTH = 3;
-	char *kernel_file[2] = {"kernel.in", "kernel.in"};
-
-	/*--------------------------------------------------
-	* const int REAL_COLS = 100; 
-	* const double start_t = 0;
-	* const double stop_t = 100000;
-	* double record_interval = (stop_t-start_t)/10;		// in units of t
-	* / *** population growth parameters *** /
-	* const double r = 0.1;
-	* const double K = 10;
-	* / *** natural selection parameters *** /
-	* const double h2 = 0.6;
-	* const double V_s = 200;
-	* const double V_p = 1;
-	* const double V_u = 40;
-	* / *** parameter for frequency-independent hybridization (0=none) *** /
-	* const double beta = 0.00;
-	*--------------------------------------------------*/
-	struct KeyValue *kv;
-	char k[100], v[100];
 	Params *parameters;
 
+	/* all of these are specified in the input parameter file */
 	double r;
 	double K;
 	double h2;
@@ -67,87 +33,32 @@ int main(int argc, char *argv[])
 	double V_p;
 	double V_u;
 	double beta;
-	double delta = 0.;    // if non-zero in param file, don't use kernel
+	double delta;
+	int space_size;
 
+	/* use this for undefined mean phenotypes */
+	const int UNDEF = -9999;
 
-/* no need to alter these */
-
-	/*--------------------------------------------------
-	* const int TOTAL_COLS = (REAL_COLS + MAX_KERN_WIDTH-1); 
-	* const int REAL_START = ((MAX_KERN_WIDTH-1)/2);
-	* const int REAL_STOP = (REAL_START + REAL_COLS -1);
-	*--------------------------------------------------*/
-	int TOTAL_COLS;
-	int REAL_START;
-	int REAL_STOP; 
-
-	const int UNDEF = -9999;		// use this for undefined mean phenotypes
-
-	// keep two copies of the space so events can happen simultaneously
-	//Cell space[TOTAL_COLS][2];  FIXME: declared below, but should be up here
+	/* keep two copies of the space so events can happen simultaneously */
+	Cell space[10000][2];  /* MAX_SPACE_SIZE */
 	int old, new;
+
+	/* output files */
+	FILE *fp_time, *fp_num1, *fp_num2, *fp_zbar1, *fp_zbar2;
+
+	int i, t, sp;
 
 	int t_steps;
 	int recorded;
-
-	double *base_kernel[2];
-	int kernel_width[2], kernel_halfwidth[2];
-	int kern_check = -99;
-
-	FILE *fp_time, *fp_num1, *fp_num2, *fp_zbar1, *fp_zbar2;
-
-	int i, j, t, sp;
 
 	double n_old, n_other, n_new;
 	double zbar_old, zbar_other, zbar_new;
 	double w_bar, opt;
 
+
 	/*** read in the parameter file ***/
 
-	if (argc < 2)
-	{
-		fprintf(stderr, "need to specify a parameters file\n");
-		return -1;
-	}
-
-	parameters = NewParams();
-	kv = loadKeyValue(argv[1]);
-	if (kv == 0)
-	{
-		fprintf(stderr, "unable to load parameters file\n");
-		return -1;
-	}
-
-	/* overwrite parameter values with those specified on the command line */
-     if (argc > 2) for(i = 2; i < argc; i++)
-	{
-		if (argv[i][0] == '=')
-		{
-			fprintf(stderr, "Warning -- option begins with = "
-					"(be sure to use option=value, without spaces)\n");
-		}
-		for (j = 0; argv[i][j] != 0; j++)
-			if (argv[i][j] == '=')
-				argv[i][j] = ' ';
-		if (sscanf(argv[i], "%s %s", k, v) != 2)
-			continue;
-
-		j = KeyValuekeyindex(kv, k);
-		if (j < 0)
-			KeyValueaddparm(kv, k, v);
-		else
-		{
-			free(kv->value[j]);
-			kv->value[j] = strdup(v);
-		}
-	}
-
-	if (AcquireParams(kv, parameters) == -1)
-	{
-		fprintf(stderr, "unable to proceed -- "
-				"not all required parameters specified\n");
-		return -1;
-	}
+	parameters = GetParams(argc, argv);
 
 	r     = parameters->r;
 	K     = parameters->K;
@@ -158,48 +69,13 @@ int main(int argc, char *argv[])
 	beta  = parameters->beta;
 	delta = parameters->delta;
 
-	TOTAL_COLS = (parameters->space_size + MAX_KERN_WIDTH-1); 
-	REAL_START = ((MAX_KERN_WIDTH-1)/2);
-	REAL_STOP = (REAL_START + parameters->space_size - 1);
-	Cell space[TOTAL_COLS][2];  // FIXME: bad form to declare this down here
-
+	space_size = parameters->space_size;
 	t_steps = parameters->stop_t - parameters->start_t + 1;
 
-	/*** if delta is specified, set up a simple kernel ***/
-	if (delta > 0)
-	{
-		for (sp=0; sp<2; sp++)
-		{
-			kernel_halfwidth[sp] = 1;
-			kernel_width[sp] = 3;
-
-			base_kernel[sp] = allocate_kernel(kernel_width[sp]);
-			base_kernel[sp][0] = delta;
-			base_kernel[sp][1] = -2*delta;
-			base_kernel[sp][2] = delta;
-		}
-	}
-
-	/*** otherwise, read in the dispersal kernel to base_kernel ***/
-	else
-	{
-		for (sp=0; sp<2; sp++)
-		{
-			kern_check = read_kernel(kernel_file[sp], &base_kernel[sp], 
-					&kernel_width[sp], MAX_KERN_WIDTH);
-			if (kern_check != 0)
-				return -1;
-			kernel_halfwidth[sp] = (kernel_width[sp]-1)/2;
-		}
-	}
-
-	/*** assign dispersal kernels to each cell ***/
-	for (sp=0; sp<2; sp++)
-		assign_kernels(space, base_kernel[sp], kernel_width[sp], 
-				MAX_KERN_WIDTH, TOTAL_COLS, REAL_START, REAL_STOP, sp);
 
 	/*** clear the landscape and place initial individuals ***/
-	initialize_landscape(space, parameters, TOTAL_COLS, REAL_START, REAL_STOP, UNDEF);
+
+	initialize_landscape(space, parameters, space_size, UNDEF);
 
 	old = 0;
 	new = 1;
@@ -212,8 +88,8 @@ int main(int argc, char *argv[])
 	fp_zbar2 = fopen("zbar2.dat", "w");
 	recorded = 0;
 	fprintf(fp_time, "%d\n", 0);
-	record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space, old, 
-			REAL_START, REAL_STOP);
+	record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space, old,
+	                 space_size);
 	recorded++;
 
 
@@ -221,13 +97,12 @@ int main(int argc, char *argv[])
 
 	for (t=1; t<t_steps; t++)
 	{
-
 		/*** competition and hybridization ***/
 		
-		for (i=REAL_START; i<=REAL_STOP; i++)
+		for (i=0; i<space_size; i++)
 		{
 			/* get the optimal phenotype for this cell */
-			opt = get_optimum(i-REAL_START, parameters->opt_slope);
+			opt = get_optimum(i, parameters->opt_slope);
 
 			/* effects of competition and stabilizing selection */
 
@@ -257,53 +132,54 @@ int main(int argc, char *argv[])
 					zbar_new = space[i][old].zbar[sp];
 				}
 
-				/* put the post-competition values into "new" (not "old" because then sp1's changes would affect sp2 immediately) */
+				/* put the post-competition values into "new" (not "old"
+ 				 *   because then sp1's changes would affect sp2
+				 *   immediately) */
 				space[i][new].num[sp] = n_new;
 				space[i][new].zbar[sp] = zbar_new;
 				space[i][new].ztotal[sp] = zbar_new * n_new;
 			} 
 		}
 
-		/* swap new and old if they didn't get swapped at the end of the spatial loop */
+		/* swap new and old, since dispersal happens after competition */
 		new = old;
 		old = (new+1)%2;
 
 
 		/*** dispersal ***/
-		empty_border(space, REAL_START, REAL_STOP, TOTAL_COLS, UNDEF); // empties old and new
-		dispersal_happens(space, kernel_halfwidth, old, REAL_START, REAL_STOP, UNDEF);
+		dispersal_happens(space, old, space_size, delta, UNDEF);
 
 
 		/*** record the new state, if it's time to ***/
 		if (t == recorded * parameters->record_interval)
 		{
 			fprintf(fp_time, "%d\n", t);
-			record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space, new, REAL_START, REAL_STOP);
+			record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space,
+			                 new, space_size);
 			recorded++;
 			printf("t = %d\n", t);
-//printf("n1 = %f, n2 = %f, z1bar = %f, z2bar = %f\n", space[20+REAL_START][old].num[0], space[20+REAL_START][old].num[1], space[20+REAL_START][old].zbar[0], space[20+REAL_START][old].zbar[1]);
 		}
 
-		/*** the new state becomes the old state ***/
+		/* swap new and old, in preparation for the next generation */
 		new = old;
 		old = (new+1)%2;
 	}
 
-
+	/* got all the results now */
 	fclose(fp_time);
 	fclose(fp_num1);
 	fclose(fp_num2);
 	fclose(fp_zbar1);
 	fclose(fp_zbar2);
-
+	FreeParams(parameters);
 
 	/*** record the final state ***/
 	fp_time = fopen("final.dat", "w");
-	for (i=REAL_START; i<=REAL_STOP; i++)
-		fprintf(fp_time, "%e\t%e\t%e\t%e\n", space[i][old].num[0], space[i][old].num[1], space[i][old].zbar[0], space[i][old].zbar[1]);
+	for (i=0; i<space_size; i++)
+		fprintf(fp_time, "%e\t%e\t%e\t%e\n", space[i][old].num[0],
+		        space[i][old].num[1], space[i][old].zbar[0], 
+		        space[i][old].zbar[1]);
 	fclose(fp_time);
-
-	FreeParams(parameters);
 
 
 	return 0;

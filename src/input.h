@@ -34,6 +34,7 @@ typedef struct
 Params *NewParams();
 void FreeParams(Params *params);
 int AcquireParams(struct KeyValue *kv, Params *parameters);
+Params *GetParams(int argc, char *argv[]);
 
 
 #endif

@@ -60,7 +60,7 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
      if (parameters->V_s == KV_FLOATERR)
 	{
 		fprintf(stderr, "need to specify variance of stabilizing selection,"
-			    " V_s\n");
+		        " V_s\n");
 		return -1;
 	}
 
@@ -75,7 +75,7 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
      if (parameters->V_u == KV_FLOATERR)
 	{
 		fprintf(stderr, "need to specify variance of competition function,"
-			    " V_u\n");
+		        " V_u\n");
 		return -1;
 	}
 
@@ -87,29 +87,10 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	}
 
 	parameters->delta = getKeyValuedouble(kv, "delta");
-	parameters->dispersal_file = getKeyValuestring(kv, "dispersal_file");
      if (parameters->delta == KV_FLOATERR)
 	{
-		// if none specified, use dispersal file
-     	if (parameters->dispersal_file == 0)
-		{
-			fprintf(stderr, "need to specify dispersal, either delta or " 
-					"dispersal_file\n");
-			return -1;
-		}
-		else
-		{
-			fprintf(stderr, "dispersal file %s specified, but can't yet get" 
-					" values from it; use delta instead\n",
-					parameters->dispersal_file);
-			//return -1;
-		}
-	}
-	else
-	{
-		if (parameters->dispersal_file != 0)
-			fprintf(stderr, "ignoring dispersal_file because delta was " 
-					"specified\n");
+		fprintf(stderr, "need to specify dispersal probability, delta\n");
+		return -1;
 	}
 
 	/*** landscape ***/
@@ -164,4 +145,63 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	}
 
 	return 0;		// return -1 elsewhere if there's an error
+}
+
+
+Params *GetParams(int argc, char *argv[])
+{
+	struct KeyValue *kv;
+	char k[100], v[100];
+	Params *parameters;
+	int i, j;
+
+	/* open the user's file */
+
+	if (argc < 2)
+	{
+		fprintf(stderr, "need to specify a parameters file\n");
+		exit(1);
+	}
+
+	parameters = NewParams();
+	kv = loadKeyValue(argv[1]);
+	if (kv == 0)
+	{
+		fprintf(stderr, "unable to load parameters file\n");
+		exit(1);
+	}
+
+	/* overwrite parameter values with those specified on the command line */
+
+     if (argc > 2) for(i = 2; i < argc; i++)
+	{
+		if (argv[i][0] == '=')
+		{
+			fprintf(stderr, "Warning -- option begins with = "
+					"(be sure to use option=value, without spaces)\n");
+		}
+		for (j = 0; argv[i][j] != 0; j++)
+			if (argv[i][j] == '=')
+				argv[i][j] = ' ';
+		if (sscanf(argv[i], "%s %s", k, v) != 2)
+			continue;
+
+		j = KeyValuekeyindex(kv, k);
+		if (j < 0)
+			KeyValueaddparm(kv, k, v);
+		else
+		{
+			free(kv->value[j]);
+			kv->value[j] = strdup(v);
+		}
+	}
+
+	if (AcquireParams(kv, parameters) == -1)
+	{
+		fprintf(stderr, "unable to proceed -- "
+				"not all required parameters specified\n");
+		exit(1);
+	}
+
+	return parameters;
 }

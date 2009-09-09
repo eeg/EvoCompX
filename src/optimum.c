@@ -8,9 +8,9 @@
  ***/
 
 
+/* linear now, but could be anything */
 double get_optimum(int cell_num, double slope)
 {
-	//double slope = 0.5;
 	double opt;
 
 	opt = slope*cell_num;
