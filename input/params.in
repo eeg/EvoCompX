@@ -1,3 +1,5 @@
+num_species = 2
+
 ### biology ###
 
 # logistic growth
@@ -11,11 +13,10 @@ V_p = 1
 V_u = 40
 
 # frequency-independent hybridization
-#beta = 0
+beta = 0
 
 # simple dispersal
 delta = 0.1
-#dispersal_file = dispersal.in
 
 ### landscape ###
 

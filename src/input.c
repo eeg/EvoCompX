@@ -3,6 +3,7 @@
 #include <string.h>
 #include "input.h"
 #include "keyvalue.h"
+#include "landscape.h"
 
 /***
  * user input of parameters
@@ -33,6 +34,18 @@ void FreeParams(Params *params)
 /*** read in the user's input parameter values ***/
 int AcquireParams(struct KeyValue *kv, Params *parameters)
 {
+	parameters->num_sp = getKeyValueint(kv, "num_species");
+     if (parameters->num_sp == KV_INTERR)
+	{
+		fprintf(stderr, "need to specify number of species, num_species\n");
+		return -1;
+	}
+     if (parameters->num_sp < 2 || parameters->num_sp > MAX_NUM_SP)
+	{
+		fprintf(stderr, "need 2 <= num_species <= %d\n", MAX_NUM_SP);
+		return -1;
+	}
+
 	/*** biology ***/
 
 	parameters->r = getKeyValuedouble(kv, "r");
@@ -82,7 +95,7 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->beta = getKeyValuedouble(kv, "beta");
      if (parameters->beta == KV_FLOATERR)
 	{
-		// default is no hybridization
+		/* default is no hybridization */
 		parameters->beta = 0;
 	}
 
@@ -144,7 +157,7 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 			(parameters->stop_t - parameters->start_t)/10;
 	}
 
-	return 0;		// return -1 elsewhere if there's an error
+	return 0;		/* returns -1 elsewhere if there's an error */
 }
 
 

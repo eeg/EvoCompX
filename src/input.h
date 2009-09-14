@@ -1,12 +1,18 @@
 #ifndef __INPUT_H__
 #define __INPUT_H__ 
 
+/* for essentially-zero population size? */
 #define TINY 1E-16
+
+/* for undefined mean phenotypes */
+#define UNDEF -9999
 
 #include "keyvalue.h"
 
 typedef struct
 {
+	int num_sp;
+
 	/* biology */
 	double r;
 	double K;
@@ -16,7 +22,6 @@ typedef struct
 	double V_u;
 	double beta;
 	double delta;
-	const char *dispersal_file;
 
 	/* landscape */
 	int space_size;

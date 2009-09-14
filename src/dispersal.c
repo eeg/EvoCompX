@@ -2,13 +2,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include "dispersal.h"
+#include "input.h"
 
 /* note: will need more care if delta varies with cell or direction */
 
 /* exchange between cells i and j, from the perspective of i 
  * adjusts num and ztotal, but not zbar */
-void nearest_neighbor(Cell space[][2], int old, int i, int j, double delta, 
-                      int sp)
+void nearest_neighbor(Cell space[][2], int old, int i, int j, 
+                      double delta, int sp)
 {
 	int new = (old+1)%2;
 
@@ -26,14 +27,16 @@ void nearest_neighbor(Cell space[][2], int old, int i, int j, double delta,
 
 
 /* run the exchange over the landscape */
-void dispersal_happens(Cell space[][2], int old, int space_size, double delta,
-                       int UNDEF)
+void dispersal_happens(Cell space[][2], int old, Params *params)
 {
 	int new = (old+1)%2;
 	int i, sp;
 
+	int space_size = params->space_size;
+	double delta = params->delta;
+
 	/* put a copy of the old landscape into new */
-	for (sp=0; sp<2; sp++)
+	for (sp=0; sp<params->num_sp; sp++)
 	{
 		for (i=0; i<space_size; i++)
 		{
@@ -43,7 +46,7 @@ void dispersal_happens(Cell space[][2], int old, int space_size, double delta,
 		}
 	}
 
-	for (sp=0; sp<2; sp++)
+	for (sp=0; sp<params->num_sp; sp++)
 	{
 		/* nearest-neighbor dispersal for all cells except at either edge */
 		for (i=1; i<space_size-1; i++)

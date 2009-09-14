@@ -1,8 +1,12 @@
 Had to remove -O2 from gcc in order to get rid of warn_unused_result messages
 
 make UNDEF global?
+	done: input.h
+remove TINY (input.h, not used)
+do record-keeping variables work?
 
 Allow more than two species
+	structure is there, just need to try it
 
 Allow asymmetric competition (competition matrix or kappa)
    (should be okay as long as phenotype distribution and competition         function are symmetric -- see C&T below Eq13, response1.txt #11, lab book p10; or see Silwood notes about relaxing weak competition assumption) 

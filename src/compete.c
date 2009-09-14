@@ -1,5 +1,6 @@
 /***
   * keep track of numbers and mean phenotypes of each of two species
+  **** in progress: any number of species...
   * local adaptation
   * density dependent growth (equal intra- and inter-specific competition)
   * one-dimensional space
@@ -35,25 +36,24 @@ int main(int argc, char *argv[])
 	double beta;
 	double delta;
 	int space_size;
-
-	/* use this for undefined mean phenotypes */
-	const int UNDEF = -9999;
+	int num_sp;
 
 	/* keep two copies of the space so events can happen simultaneously */
-	Cell space[10000][2];  /* MAX_SPACE_SIZE */
+	Cell space[MAX_SPACE_SIZE][2];
 	int old, new;
 
 	/* output files */
-	FILE *fp_time, *fp_num1, *fp_num2, *fp_zbar1, *fp_zbar2;
+	FILE *fp_time, *fp_num[MAX_NUM_SP], *fp_zbar[MAX_NUM_SP];
+	char str[1000];
 
-	int i, t, sp;
+	int i, t, sp, osp;
 
 	int t_steps;
 	int recorded;
 
 	double n_old, n_other, n_new;
 	double zbar_old, zbar_other, zbar_new;
-	double w_bar, opt;
+	double w_bar, opt, w_temp, z_temp;
 
 
 	/*** read in the parameter file ***/
@@ -69,27 +69,33 @@ int main(int argc, char *argv[])
 	beta  = parameters->beta;
 	delta = parameters->delta;
 
+	num_sp = parameters->num_sp;
 	space_size = parameters->space_size;
 	t_steps = parameters->stop_t - parameters->start_t + 1;
 
 
 	/*** clear the landscape and place initial individuals ***/
 
-	initialize_landscape(space, parameters, space_size, UNDEF);
+	initialize_landscape(space, parameters);
 
 	old = 0;
 	new = 1;
 
-	/*** write the initial condition to the files ***/
+	/*** write the initial condition to the output files ***/
+
 	fp_time = fopen("time.dat", "w");
-	fp_num1 = fopen("num1.dat", "w");
-	fp_num2 = fopen("num2.dat", "w");
-	fp_zbar1 = fopen("zbar1.dat", "w");
-	fp_zbar2 = fopen("zbar2.dat", "w");
+	for (sp=0; sp<num_sp; sp++)
+	{
+		sprintf(str, "num%d.dat", sp+1);
+		fp_num[sp] = fopen(str, "w");
+
+		sprintf(str, "zbar%d.dat", sp+1);
+		fp_zbar[sp] = fopen(str, "w");
+	}
+
 	recorded = 0;
 	fprintf(fp_time, "%d\n", 0);
-	record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space, old,
-	                 space_size);
+	record_landscape(fp_num, fp_zbar, space, parameters, old);
 	recorded++;
 
 
@@ -106,30 +112,42 @@ int main(int argc, char *argv[])
 
 			/* effects of competition and stabilizing selection */
 
-			for (sp=0; sp<2; sp++)
+			for (sp=0; sp<num_sp; sp++)
 			{
 				n_old = space[i][old].num[sp];
+				zbar_old = space[i][old].zbar[sp];
 
 				if (n_old > 0)
 				{
-					zbar_old = space[i][old].zbar[sp];
-					zbar_other = space[i][old].zbar[(sp+1)%2];
-					n_other = space[i][old].num[(sp+1)%2];
-					
-					/* competition/logistic growth changes numbers */
-					w_bar = r - (r/K)*sqrt(V_u/(V_p+V_u))*(n_old + n_other*exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2))) - V_p/(2*V_s) - pow(opt-zbar_old, 2)/(2*V_s);
+
+					/* competition/selection change num and zbar */
+					w_temp = 0;
+					z_temp = 0;
+					for (osp=0; osp<num_sp; osp++) /* "other" species */
+					{
+						if (osp != sp)
+						{
+							zbar_other = space[i][old].zbar[osp];
+							n_other = space[i][old].num[osp];
+
+							w_temp += n_other * exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2));
+							z_temp += n_other * (zbar_old - zbar_other) * exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2));
+						}
+					}
+
+					w_bar = r - pow(opt-zbar_old, 2)/(2*V_s) - V_p/(2*V_s) - (r/K)*sqrt(V_u/(V_p+V_u)) * (n_old + w_temp);
+
 					n_new = exp(w_bar) * n_old;
 
-					/* competition/selection changes mean phenotype */
-					zbar_new = zbar_old + h2*V_p*((opt-zbar_old)/V_s + (r/K)*sqrt(V_u/(V_p+V_u))*n_other*(zbar_old-zbar_other)/(2*(V_p+V_u))*exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2)));
-
+					zbar_new = zbar_old + h2*V_p*((opt-zbar_old)/V_s + r/(2*K)*sqrt(V_u)/pow(V_p+V_u, 1.5) * z_temp);
+							
 					/* hybridization changes numbers */
 					n_new = n_new * n_old/(n_old + beta*n_other);
 				}
 				else 
 				{
 					n_new = n_old;
-					zbar_new = space[i][old].zbar[sp];
+					zbar_new = zbar_old;
 				}
 
 				/* put the post-competition values into "new" (not "old"
@@ -147,15 +165,14 @@ int main(int argc, char *argv[])
 
 
 		/*** dispersal ***/
-		dispersal_happens(space, old, space_size, delta, UNDEF);
+		dispersal_happens(space, old, parameters);
 
 
 		/*** record the new state, if it's time to ***/
 		if (t == recorded * parameters->record_interval)
 		{
 			fprintf(fp_time, "%d\n", t);
-			record_landscape(fp_num1, fp_num2, fp_zbar1, fp_zbar2, space,
-			                 new, space_size);
+			record_landscape(fp_num, fp_zbar, space, parameters, new);
 			recorded++;
 			printf("t = %d\n", t);
 		}
@@ -167,18 +184,23 @@ int main(int argc, char *argv[])
 
 	/* got all the results now */
 	fclose(fp_time);
-	fclose(fp_num1);
-	fclose(fp_num2);
-	fclose(fp_zbar1);
-	fclose(fp_zbar2);
+	for (sp=0; sp<num_sp; sp++)
+	{
+		fclose(fp_num[sp]);
+		fclose(fp_zbar[sp]);
+	}
 	FreeParams(parameters);
 
 	/*** record the final state ***/
 	fp_time = fopen("final.dat", "w");
 	for (i=0; i<space_size; i++)
-		fprintf(fp_time, "%e\t%e\t%e\t%e\n", space[i][old].num[0],
-		        space[i][old].num[1], space[i][old].zbar[0], 
-		        space[i][old].zbar[1]);
+	{
+		for (sp=0; sp<num_sp; sp++)
+			fprintf(fp_time, "%e\t", space[i][old].num[sp]); 
+		for (sp=0; sp<num_sp; sp++)
+			fprintf(fp_time, "%e\t", space[i][old].zbar[sp]); 
+		fprintf(fp_time, "\n");
+	}
 	fclose(fp_time);
 
 
