@@ -3,10 +3,10 @@
 #--------------------------------------------------
 # This script is useful for creating files specifying the initial condition.
 # Its output is two files, one for abundance and one for mean phenotype.
-# Each of those output files has one row per spatial cell and one column per species.
+# Each output file has one row per spatial cell and one column per species.
 #-------------------------------------------------- 
 
-UNDEF = -9999    # this must match the value in compete.c
+UNDEF = -9999    # this must match the value in input.h
 
 def list_of_lists(n):
 	'''return a list containing n empty lists'''
@@ -22,13 +22,13 @@ def get_optimum(x):
 
 
 num_cells = 100          # landscape size
-num_sp = 2               # number of species
+num_sp = 3               # number of species
 
 # one element for each species; start numbering cells with 0
-start = [0, 99]           # first cell in range where the species is
-stop = [0, 99]            # last cell in range where the species is
-abun = [4.9, 5.1]         # abundance in each cell in those ranges
-zoffset = [-0.1, 0.1]     # offset from optimum phenotype
+start = [0, 25, 99]       # first cell in range where the species is
+stop = [0, 28, 99]        # last cell in range where the species is
+abun = [4.9, 5.0, 5.1]    # abundance in each cell in those ranges
+zoffset = [-0.1, 0, 0.1]  # offset from optimum phenotype
   # or instead, could give fixed values for initial zbar
 # (if there are many species, could use a loop to generate the above lists)
 
