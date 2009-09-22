@@ -4,11 +4,11 @@ OBJECTS = ${SOURCE:.c=.o}
 TARGETS = compete
 
 .PREFIXES = .c .o 
-CFLAGS = -Wall -g
+CFLAGS = -Wall -O2
 LDFLAGS = -lm
 CC = gcc
 
-.c.o: 
+.c.o:
 	${CC} -c ${CFLAGS} $< 
 
 compete: ${OBJECTS}
@@ -17,4 +17,4 @@ compete: ${OBJECTS}
 all: ${TARGETS}
 
 clean:
-	rm ${TARGETS} *.o
+	rm -f ${TARGETS} *.o

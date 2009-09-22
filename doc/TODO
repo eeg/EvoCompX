@@ -6,3 +6,14 @@ do record-keeping variables work?
 
 Allow asymmetric competition (competition matrix or kappa)
    (should be okay as long as phenotype distribution and competition         function are symmetric -- see C&T below Eq13, response1.txt #11, lab book p10; or see Silwood notes about relaxing weak competition assumption) 
+
+
+comments from Walter:
+document data structures
+combine landscape and dispersal
+make UNDEF a more unique name
+more helpful message when run without input
+version number
+GPL file and comments in each source file (gplize?)
+move usage to README
+svn export

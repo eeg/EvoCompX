@@ -1,6 +1,5 @@
 /***
-  * keep track of numbers and mean phenotypes of each of two species
-  **** in progress: any number of species...
+  * keep track of numbers and mean phenotypes of each of several species
   * local adaptation
   * density dependent growth (equal intra- and inter-specific competition)
   * one-dimensional space
@@ -27,6 +26,7 @@ int main(int argc, char *argv[])
 	Params *parameters;
 
 	/* all of these are specified in the input parameter file */
+	/* FIXME: don't use these? */
 	double r;
 	double K;
 	double h2;
@@ -117,12 +117,14 @@ int main(int argc, char *argv[])
 				n_old = space[i][old].num[sp];
 				zbar_old = space[i][old].zbar[sp];
 
+				/* FIXME functionalize ?  */
 				if (n_old > 0)
 				{
 
 					/* competition/selection change num and zbar */
 					w_temp = 0;
 					z_temp = 0;
+					n_other = 0;
 					for (osp=0; osp<num_sp; osp++) /* "other" species */
 					{
 						if (osp != sp)
