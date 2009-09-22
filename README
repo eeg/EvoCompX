@@ -1,5 +1,20 @@
+EvoCompX: evolution and competition across space
+version 0.1
+Emma Goldberg <eeg@umd.edu>
+
+This program implements the model of Case and Taper (2000, AmNat), with some extensions.
 
 
-To compile:
-
+cd src/
 make
+	creates compete executable
+cd ../input/
+./make_initial.py
+	creates num.in and zbar.in
+../src/compete params.in
+	creates num1.dat, num2.dat, zbar1.dat, zbar2.dat, final.dat, time.dat
+
+
+Compile
+First run
+Customization

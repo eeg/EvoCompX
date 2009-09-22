@@ -9,9 +9,9 @@
 /*** spatial units on the landscape ***/
 typedef struct cell
 {
-	double num[MAX_NUM_SP];
-	double zbar[MAX_NUM_SP];
-	double ztotal[MAX_NUM_SP];
+	double num[MAX_NUM_SP];      /* number of individuals of each species */
+	double zbar[MAX_NUM_SP];     /* mean phenotype for each species       */
+	double ztotal[MAX_NUM_SP];   /* num * zbar, for each species          */
 } Cell;
 
 void record_landscape(FILE **fp_num, FILE **fp_zbar, Cell space[][2],

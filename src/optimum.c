@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+
 #include "landscape.h"
 
+
 /***
- * Specify the optimum phenotype over space.
+ * specify the optimum phenotype over space
  ***/
 
 

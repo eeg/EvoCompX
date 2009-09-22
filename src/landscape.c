@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+
 #include "input.h"
 #include "landscape.h"
 #include "optimum.h"
 
 
 /***
- * These functions initialize and report the state of the landscape.  
+ * initialize and report the state of the landscape
  ***/
+
 
 /*** write the abundances and mean phenotypes to output files ***/
 void record_landscape(FILE **fp_num, FILE **fp_zbar, Cell space[][2],
@@ -46,7 +48,7 @@ void initialize_landscape(Cell space[][2], Params *params)
 			for (sp=0; sp<params->num_sp; sp++)
 			{
 				space[i][j].num[sp] = 0;
-				space[i][j].zbar[sp] = UNDEF;
+				space[i][j].zbar[sp] = UNDEF_PHEN;
 				space[i][j].ztotal[sp] = 0;
 			}
 		}
@@ -61,8 +63,16 @@ void initialize_landscape(Cell space[][2], Params *params)
 	{
 		for (sp=0; sp<params->num_sp; sp++)
 		{
-			fscanf(num_fp, "%lf", &space[i][0].num[sp]);
-			fscanf(zbar_fp, "%lf", &space[i][0].zbar[sp]);
+			if(fscanf(num_fp, "%lf", &space[i][0].num[sp]) != 1)
+			{
+				fprintf(stderr, "Error: invalid input\n");
+				exit(1);
+			}
+			if(fscanf(zbar_fp, "%lf", &space[i][0].zbar[sp]) != 1)
+			{
+				fprintf(stderr, "Error: invalid input\n");
+				exit(1);
+			}
 			space[i][0].ztotal[sp] = space[i][0].num[sp] *
 								space[i][0].zbar[sp];
 		}

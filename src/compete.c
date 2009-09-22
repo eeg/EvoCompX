@@ -1,210 +1,102 @@
-/***
-  * keep track of numbers and mean phenotypes of each of several species
-  * local adaptation
-  * density dependent growth (equal intra- and inter-specific competition)
-  * one-dimensional space
-  * discrete time
-  * nearest-neighbor dispersal (though could be repeated within a generation)
-  * no dispersal barriers
-***/
-
-
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include <string.h>
 
-#include "dispersal.h"
-#include "landscape.h"
+#include "compete.h"
 #include "optimum.h"
-#include "keyvalue.h"
-#include "input.h"
 
 
-int main(int argc, char *argv[])
+/*** 
+ * competition, stabilizing selection, hybridization 
+ ***/
+
+
+void competition_happens(Cell space[][2], int old, Params *params)
 {
-	Params *parameters;
+	double nz_new[2];           /* n_new, zbar_new */
+	double n_old, n_other;
+	int new = (old+1)%2;
+	double opt;
+	int i, sp, osp;
 
-	/* all of these are specified in the input parameter file */
-	/* FIXME: don't use these? */
-	double r;
-	double K;
-	double h2;
-	double V_s; 
-	double V_p;
-	double V_u;
-	double beta;
-	double delta;
-	int space_size;
-	int num_sp;
-
-	/* keep two copies of the space so events can happen simultaneously */
-	Cell space[MAX_SPACE_SIZE][2];
-	int old, new;
-
-	/* output files */
-	FILE *fp_time, *fp_num[MAX_NUM_SP], *fp_zbar[MAX_NUM_SP];
-	char str[1000];
-
-	int i, t, sp, osp;
-
-	int t_steps;
-	int recorded;
-
-	double n_old, n_other, n_new;
-	double zbar_old, zbar_other, zbar_new;
-	double w_bar, opt, w_temp, z_temp;
-
-
-	/*** read in the parameter file ***/
-
-	parameters = GetParams(argc, argv);
-
-	r     = parameters->r;
-	K     = parameters->K;
-	h2    = parameters->h2;
-	V_s   = parameters->V_s; 
-	V_p   = parameters->V_p;
-	V_u   = parameters->V_u;
-	beta  = parameters->beta;
-	delta = parameters->delta;
-
-	num_sp = parameters->num_sp;
-	space_size = parameters->space_size;
-	t_steps = parameters->stop_t - parameters->start_t + 1;
-
-
-	/*** clear the landscape and place initial individuals ***/
-
-	initialize_landscape(space, parameters);
-
-	old = 0;
-	new = 1;
-
-	/*** write the initial condition to the output files ***/
-
-	fp_time = fopen("time.dat", "w");
-	for (sp=0; sp<num_sp; sp++)
+	for (i=0; i<params->space_size; i++)
 	{
-		sprintf(str, "num%d.dat", sp+1);
-		fp_num[sp] = fopen(str, "w");
+		/* get the optimal phenotype for this cell */
+		opt = get_optimum(i, params->opt_slope);
 
-		sprintf(str, "zbar%d.dat", sp+1);
-		fp_zbar[sp] = fopen(str, "w");
-	}
+		/*** effects of competition, stabilizing selection, hybridization ***/
 
-	recorded = 0;
-	fprintf(fp_time, "%d\n", 0);
-	record_landscape(fp_num, fp_zbar, space, parameters, old);
-	recorded++;
-
-
-	printf("t = 0\n");
-
-	for (t=1; t<t_steps; t++)
-	{
-		/*** competition and hybridization ***/
-		
-		for (i=0; i<space_size; i++)
+		for (sp=0; sp<params->num_sp; sp++)
 		{
-			/* get the optimal phenotype for this cell */
-			opt = get_optimum(i, parameters->opt_slope);
+			n_old = space[i][old].num[sp];
 
-			/* effects of competition and stabilizing selection */
-
-			for (sp=0; sp<num_sp; sp++)
+			if (n_old > 0)  /* if the species is present, do stuff */
 			{
-				n_old = space[i][old].num[sp];
-				zbar_old = space[i][old].zbar[sp];
+				/* competition and selection update nz_new[] */
+				comp_sel(nz_new, sp, i, opt, space, old, params);
 
-				/* FIXME functionalize ?  */
-				if (n_old > 0)
+				/* hybridization changes numbers */
+				if (params->beta > 0)
 				{
-
-					/* competition/selection change num and zbar */
-					w_temp = 0;
-					z_temp = 0;
 					n_other = 0;
-					for (osp=0; osp<num_sp; osp++) /* "other" species */
-					{
+					for (osp=0; osp<params->num_sp; osp++)
 						if (osp != sp)
-						{
-							zbar_other = space[i][old].zbar[osp];
-							n_other = space[i][old].num[osp];
-
-							w_temp += n_other * exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2));
-							z_temp += n_other * (zbar_old - zbar_other) * exp((-1/(4*(V_p+V_u)))*pow(zbar_old-zbar_other, 2));
-						}
-					}
-
-					w_bar = r - pow(opt-zbar_old, 2)/(2*V_s) - V_p/(2*V_s) - (r/K)*sqrt(V_u/(V_p+V_u)) * (n_old + w_temp);
-
-					n_new = exp(w_bar) * n_old;
-
-					zbar_new = zbar_old + h2*V_p*((opt-zbar_old)/V_s + r/(2*K)*sqrt(V_u)/pow(V_p+V_u, 1.5) * z_temp);
-							
-					/* hybridization changes numbers */
-					n_new = n_new * n_old/(n_old + beta*n_other);
+							n_other += space[i][old].num[osp];
+					nz_new[0] = nz_new[0] * 
+							  n_old/(n_old + params->beta*n_other);
 				}
-				else 
-				{
-					n_new = n_old;
-					zbar_new = zbar_old;
-				}
+			}
+			else            /* if the species is absent, nothing changes */
+			{
+				nz_new[0] = n_old;
+				nz_new[1] = space[i][old].zbar[sp];
+			}
 
-				/* put the post-competition values into "new" (not "old"
- 				 *   because then sp1's changes would affect sp2
-				 *   immediately) */
-				space[i][new].num[sp] = n_new;
-				space[i][new].zbar[sp] = zbar_new;
-				space[i][new].ztotal[sp] = zbar_new * n_new;
-			} 
-		}
+			/* put the post-competition values into "new" (not "old"
+ 			 *   because then sp1's changes would affect sp2 immediately) */
+			space[i][new].num[sp] = nz_new[0];
+			space[i][new].zbar[sp] = nz_new[1];
+			space[i][new].ztotal[sp] = nz_new[1] * nz_new[0];
+		} 
+	}
+}
 
-		/* swap new and old, since dispersal happens after competition */
-		new = old;
-		old = (new+1)%2;
+/*** competition and selection change num and zbar ***/
+void comp_sel(double nz_new[2], int sp, int i, double opt, Cell space[][2], 
+              int old, Params *p)
+{
+	double n_old, n_other;
+	double zbar_old, zbar_other;
+	double w_temp, z_temp, w_bar;
+	int osp;
 
+	w_temp = 0;
+	z_temp = 0;
+	n_other = 0;
 
-		/*** dispersal ***/
-		dispersal_happens(space, old, parameters);
+	n_old = space[i][old].num[sp];
+	zbar_old = space[i][old].zbar[sp];
 
-
-		/*** record the new state, if it's time to ***/
-		if (t == recorded * parameters->record_interval)
+	for (osp=0; osp<p->num_sp; osp++) /* "other" species */
+	{
+		if (osp != sp)
 		{
-			fprintf(fp_time, "%d\n", t);
-			record_landscape(fp_num, fp_zbar, space, parameters, new);
-			recorded++;
-			printf("t = %d\n", t);
+			zbar_other = space[i][old].zbar[osp];
+			n_other = space[i][old].num[osp];
+
+			w_temp += n_other * exp((-1/(4*(p->V_p+p->V_u))) *
+			                         pow(zbar_old-zbar_other, 2));
+			z_temp += n_other * (zbar_old - zbar_other) * 
+			          exp((-1/(4*(p->V_p+p->V_u))) *
+			              pow(zbar_old-zbar_other, 2));
 		}
-
-		/* swap new and old, in preparation for the next generation */
-		new = old;
-		old = (new+1)%2;
 	}
 
-	/* got all the results now */
-	fclose(fp_time);
-	for (sp=0; sp<num_sp; sp++)
-	{
-		fclose(fp_num[sp]);
-		fclose(fp_zbar[sp]);
-	}
-	FreeParams(parameters);
+	w_bar = p->r - pow(opt-zbar_old, 2)/(2*p->V_s) - p->V_p/(2*p->V_s) - 
+	        (p->r/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * (n_old + w_temp);
 
-	/*** record the final state ***/
-	fp_time = fopen("final.dat", "w");
-	for (i=0; i<space_size; i++)
-	{
-		for (sp=0; sp<num_sp; sp++)
-			fprintf(fp_time, "%e\t", space[i][old].num[sp]); 
-		for (sp=0; sp<num_sp; sp++)
-			fprintf(fp_time, "%e\t", space[i][old].zbar[sp]); 
-		fprintf(fp_time, "\n");
-	}
-	fclose(fp_time);
+	nz_new[0] = exp(w_bar) * n_old;
 
-
-	return 0;
+	nz_new[1] = zbar_old + p->h2*p->V_p*((opt-zbar_old)/p->V_s + 
+	            p->r/(2*p->K) * sqrt(p->V_u)/pow(p->V_p+p->V_u, 1.5) * z_temp);
 }

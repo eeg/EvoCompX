@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "input.h"
 #include "keyvalue.h"
 #include "landscape.h"
+
 
 /***
  * user input of parameters
@@ -172,7 +174,7 @@ Params *GetParams(int argc, char *argv[])
 
 	if (argc < 2)
 	{
-		fprintf(stderr, "need to specify a parameters file\n");
+		fprintf(stderr, "\nEvoCompX requires input parameters.\nPlease see the README and example params.in file for usage examples and options.\n\n");
 		exit(1);
 	}
 

@@ -1,17 +1,17 @@
-SOURCE  = compete.c dispersal.c landscape.c optimum.c keyvalue.c input.c
-HEADERS = dispersal.h landscape.h optimum.h keyvalue.h input.h
+SOURCE  = EvoCompX.c compete.c dispersal.c landscape.c optimum.c keyvalue.c input.c
+HEADERS = compete.h dispersal.h landscape.h optimum.h keyvalue.h input.h
 OBJECTS = ${SOURCE:.c=.o}
-TARGETS = compete
+TARGETS = EvoCompX
 
 .PREFIXES = .c .o 
-CFLAGS = -Wall -O2
+CFLAGS = -Wall -g -O2
 LDFLAGS = -lm
 CC = gcc
 
-.c.o:
-	${CC} -c ${CFLAGS} $< 
+%.o: %.c $(HEADERS)
+	$(CC) -c -o $@ $< $(CFLAGS)
 
-compete: ${OBJECTS}
+EvoCompX: ${OBJECTS}
 	${CC} ${LDFLAGS} ${OBJECTS} -o $@
 	
 all: ${TARGETS}

@@ -1,10 +1,15 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
-#include "dispersal.h"
-#include "input.h"
 
-/* note: will need more care if delta varies with cell or direction */
+#include "dispersal.h"
+
+
+/*** 
+ * movement of individuals on the landscape
+ * (note: will need more care if delta varies with cell or direction)
+ ***/
+
 
 /* exchange between cells i and j, from the perspective of i 
  * adjusts num and ztotal, but not zbar */
@@ -64,7 +69,7 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 		for (i=0; i<space_size; i++)
 		{
 			if (space[i][new].num[sp] == 0)
-				space[i][new].zbar[sp] = UNDEF;
+				space[i][new].zbar[sp] = UNDEF_PHEN;
 			else
 				space[i][new].zbar[sp] = space[i][new].ztotal[sp] / 
 									space[i][new].num[sp];
