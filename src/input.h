@@ -27,9 +27,9 @@ typedef struct
 	const char *initial_zbar;       /* ...for n and zbar                */
 
 	/* record-keeping */
-	double start_t;
-	double stop_t;
-	double record_interval;
+	int start_t;
+	int stop_t;
+	int record_interval;
 
 } Params;
 

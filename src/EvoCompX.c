@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 
 	initialize_landscape(space, params);
 
+	/* indices for the two copies of the landscape */
 	old = 0;
 	new = 1;
 
@@ -66,36 +67,30 @@ int main(int argc, char *argv[])
 	}
 
 	recorded = 0;
-	fprintf(fp_time, "%d\n", 0);
+	fprintf(fp_time, "%d\n", params->start_t);
 	record_landscape(fp_num, fp_zbar, space, params, old);
 	recorded++;
 
-	printf("t = 0\n");
+	printf("t = %d\n", params->start_t);
 
 	for (t=1; t<t_steps; t++)
 	{
 		/*** competition, stabilizing selection, hybridization ***/
 		competition_happens(space, old, params);
-
-		/* swap new and old, since dispersal happens after competition */
-		new = old;
-		old = (new+1)%2;
+		/* the updated state is now in new, ready for dispersal */
 
 		/*** dispersal ***/
-		dispersal_happens(space, old, params);
+		dispersal_happens(space, new, params);
+		/* the updated state is now in old, ready for the next round */
 
 		/*** record the new state, if it's time to ***/
 		if (t == recorded * params->record_interval)
 		{
-			fprintf(fp_time, "%d\n", t);
-			record_landscape(fp_num, fp_zbar, space, params, new);
+			fprintf(fp_time, "%d\n", t + params->start_t);
+			record_landscape(fp_num, fp_zbar, space, params, old);
 			recorded++;
-			printf("t = %d\n", t);
+			printf("t = %d\n", t + params->start_t);
 		}
-
-		/* swap new and old, in preparation for the next generation */
-		new = old;
-		old = (new+1)%2;
 	}
 
 	/* got most of the results now */
@@ -107,16 +102,23 @@ int main(int argc, char *argv[])
 	}
 
 	/*** record the final state ***/
-	fp_time = fopen("final.dat", "w");
+
+	fp_num[0] = fopen("num_final.dat", "w");
+	fp_zbar[0] = fopen("zbar_final.dat", "w");
+
 	for (i=0; i<params->space_size; i++)
 	{
 		for (sp=0; sp<params->num_sp; sp++)
-			fprintf(fp_time, "%e\t", space[i][old].num[sp]); 
+			fprintf(fp_num[0], "%e\t", space[i][old].num[sp]); 
+		fprintf(fp_num[0], "\n");
+
 		for (sp=0; sp<params->num_sp; sp++)
-			fprintf(fp_time, "%e\t", space[i][old].zbar[sp]); 
-		fprintf(fp_time, "\n");
+			fprintf(fp_zbar[0], "%e\t", space[i][old].zbar[sp]); 
+		fprintf(fp_zbar[0], "\n");
 	}
-	fclose(fp_time);
+
+	fclose(fp_num[0]);
+	fclose(fp_zbar[0]);
 
 	FreeParams(params);
 

@@ -4,7 +4,7 @@ OBJECTS = ${SOURCE:.c=.o}
 TARGETS = EvoCompX
 
 .PREFIXES = .c .o 
-CFLAGS = -Wall -g -O2
+CFLAGS = -Wall -g -O3
 LDFLAGS = -lm
 CC = gcc
 

@@ -74,8 +74,8 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->V_s = getKeyValuedouble(kv, "V_s");
      if (parameters->V_s == KV_FLOATERR)
 	{
-		fprintf(stderr, "need to specify variance of stabilizing selection,"
-		        " V_s\n");
+		fprintf(stderr, "need to specify variance of stabilizing selection, "
+		        "V_s\n");
 		return -1;
 	}
 
@@ -89,8 +89,8 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->V_u = getKeyValuedouble(kv, "V_u");
      if (parameters->V_u == KV_FLOATERR)
 	{
-		fprintf(stderr, "need to specify variance of competition function,"
-		        " V_u\n");
+		fprintf(stderr, "need to specify variance of competition function, "
+		        "V_u\n");
 		return -1;
 	}
 
@@ -111,16 +111,17 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	/*** landscape ***/
 
 	parameters->space_size = getKeyValueint(kv, "space_size");
-     if (parameters->space_size == KV_INTERR)
+     if (parameters->space_size == KV_INTERR || parameters->space_size < 1)
 	{
-		parameters->space_size = 100000;
+		fprintf(stderr, "valid space_size not specified, using 100\n");
+		parameters->space_size = 100;
 	}
 
 	parameters->opt_slope = getKeyValuedouble(kv, "opt_slope");
      if (parameters->opt_slope == KV_FLOATERR)
 	{
-		fprintf(stderr, "need to specify slope of optimum phenotype,"
-			    " opt_slope\n");
+		fprintf(stderr, "need to specify slope of optimum phenotype, "
+			    "opt_slope\n");
 		return -1;
 	}
 
@@ -143,18 +144,24 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->start_t = getKeyValueint(kv, "start_t");
      if (parameters->start_t == KV_INTERR)
 	{
+		fprintf(stderr, "valid start_t not specified, using 0\n");
 		parameters->start_t = 0;
 	}
 
 	parameters->stop_t = getKeyValueint(kv, "stop_t");
-     if (parameters->stop_t == KV_INTERR)
+     if (parameters->stop_t == KV_INTERR || 
+	    parameters->stop_t < parameters->start_t)
 	{
-		parameters->stop_t = 100000;
+		fprintf(stderr, "valid stop_t not specified, using start_t + 1000\n");
+		parameters->stop_t = parameters->start_t + 1000;
 	}
 
 	parameters->record_interval = getKeyValueint(kv, "record_interval");
-     if (parameters->record_interval == KV_INTERR)
+     if (parameters->record_interval == KV_INTERR || 
+	    parameters->record_interval <= 0)
 	{
+		fprintf(stderr, "valid record_interval not specified, using elapsed "
+		                "time/10\n");
 		parameters->record_interval = 
 			(parameters->stop_t - parameters->start_t)/10;
 	}
@@ -174,7 +181,9 @@ Params *GetParams(int argc, char *argv[])
 
 	if (argc < 2)
 	{
-		fprintf(stderr, "\nEvoCompX requires input parameters.\nPlease see the README and example params.in file for usage examples and options.\n\n");
+		fprintf(stderr, "\nEvoCompX requires input parameters.\n"
+		                 "Please see the README and example params.in file "
+		                 "for usage examples and options.\n\n");
 		exit(1);
 	}
 

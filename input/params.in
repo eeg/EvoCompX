@@ -30,6 +30,6 @@ initial_zbar = zbar.in
 
 ### record-keeping ###
 
-#record_interval = 1000
-#start_t = 0
-#stop_t = 10000
+record_interval = 1000
+start_t = 0
+stop_t = 10000

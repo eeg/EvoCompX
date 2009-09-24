@@ -37,13 +37,10 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 	int new = (old+1)%2;
 	int i, sp;
 
-	int space_size = params->space_size;
-	double delta = params->delta;
-
-	/* put a copy of the old landscape into new */
+	/* put a copy of the original landscape into new */
 	for (sp=0; sp<params->num_sp; sp++)
 	{
-		for (i=0; i<space_size; i++)
+		for (i=0; i<params->space_size; i++)
 		{
 			space[i][new].num[sp] = space[i][old].num[sp];
 			space[i][new].zbar[sp] = space[i][old].zbar[sp];
@@ -51,28 +48,32 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 		}
 	}
 
-	for (sp=0; sp<params->num_sp; sp++)
+	if (params->delta > 0)
 	{
-		/* nearest-neighbor dispersal for all cells except at either edge */
-		for (i=1; i<space_size-1; i++)
+		for (sp=0; sp<params->num_sp; sp++)
 		{
-			nearest_neighbor(space, old, i, i-1, delta, sp);
-			nearest_neighbor(space, old, i, i+1, delta, sp);
-		}
+			/* nearest-neighbor dispersal for all cells except edges */
+			for (i=1; i<params->space_size-1; i++)
+			{
+				nearest_neighbor(space, old, i, i-1, params->delta, sp);
+				nearest_neighbor(space, old, i, i+1, params->delta, sp);
+			}
 
-		/* now the two edge cells */
-		nearest_neighbor(space, old, 0, 1, delta, sp);
-		nearest_neighbor(space, old, space_size-1, space_size-2, delta, sp);
+			/* now the two edge cells */
+			nearest_neighbor(space, old, 0, 1, params->delta, sp);
+			nearest_neighbor(space, old, params->space_size-1, 
+			                 params->space_size-2, params->delta, sp);
 
 
-		/* update mean phenotype, i.e. get zbar from ztotal */
-		for (i=0; i<space_size; i++)
-		{
-			if (space[i][new].num[sp] == 0)
-				space[i][new].zbar[sp] = UNDEF_PHEN;
-			else
-				space[i][new].zbar[sp] = space[i][new].ztotal[sp] / 
-									space[i][new].num[sp];
+			/* update mean phenotype, i.e. get zbar from ztotal */
+			for (i=0; i<params->space_size; i++)
+			{
+				if (space[i][new].num[sp] == 0)
+					space[i][new].zbar[sp] = UNDEF_PHEN;
+				else
+					space[i][new].zbar[sp] = space[i][new].ztotal[sp] / 
+										space[i][new].num[sp];
+			}
 		}
 	}
 }
