@@ -1,10 +1,13 @@
 EvoCompX: evolution and competition across space
+
+Version 0.1, Sept 2009
 Emma Goldberg <eeg@umd.edu>
 
 This program implements the model of Case and Taper (2000, AmNat), with some
 extensions.  In particular, any number of species can be used.  The
 phenotype-independent hybridization from Goldberg and Lande (2006) is also
-included.
+included.  See the end of this file for major limitations.
+
 
 Step 1: Compile the program
 ---------------------------
@@ -31,22 +34,22 @@ specified.  The notation mostly follows Case and Taper (2000).  Some of the
 parameters have default values, but for most of them, you'll get a warning
 message if any are unspecified.
 
-num_species:     need at least 2 species, and currently no more than 20
-r, K:            parameters of the logistic growth model
-h2:              heritability
-V_s, V_p, V_u:   variances of the stabilizing selection, phenotypic, and 
-                 competition functions
-beta:            frequency-independent hybridization
-delta:           probability of dispersal to a neighboring cell
-space_size:      number of spatial cells, currently no more than 1000
-opt_slope:       the optimum phenotype function is currently a line with 0 
-                 intercept and this slope [theta(x)]
-start_t:         the starting time (useful to change if you want to continue a
-                 previous run)
-stop_t:          the stopping time; the number of time steps to be run is 
-                 stop_t - start_t
-record_interval: after this many time steps, the results are written to files
-initial_num, initial_zbar: files with initial conditions
+num_species:      need at least 2 species, and currently no more than 20
+r, K:             parameters of the logistic growth model
+h2:               heritability
+V_s, V_p, V_u:    variances of the stabilizing selection, phenotypic, and 
+                    competition functions
+beta:             frequency-independent hybridization
+delta:            probability of dispersal to a neighboring cell
+space_size:       number of spatial cells, currently no more than 1000
+opt_slope:        the optimum phenotype function is currently a line with 0 
+                    intercept and this slope [theta(x)]
+start_t:          the starting time (useful to change if you want to continue a
+                    previous run)
+stop_t:           the stopping time; the number of time steps to be run is 
+                    stop_t - start_t
+record_interval:  after this many time steps, the results are written to files
+initial_num, initial_zbar:  files with initial conditions
 
 Initial conditions can be completely arbitrary.  The file specified by
 initial_num should contain the initial abundances, with one column per species
@@ -93,8 +96,48 @@ scenarios.  For example:
 Hugely increasing the number of species, number of spatial cells, or
 elapsed time could lead to slow run times.  So best to increase those just
 gradually.  If more than 20 species or 1000 cells are needed, the space array
-must allocated dynamically.
+must be allocated dynamically.
 
-The optimum phenotype function, theta(x), so far is just a straight line, but it
-could be made into anything.  Modifications can be hard-coded in optimum.c, or a
-few general cases can be specified there and appropriate parameters created.
+Here are some of the current limitations in the code.  All of these can be
+changed if that would be useful.
+
+(a) The value for a given parameter is the same for each species, e.g. all
+species have the same K.
+
+(b) The value for a given parameter is the same everywhere in space.
+
+(c) The maximum dispersal distance is one cell per generation.  I experimented
+with arbitrary dispersal kernels, but that got messy.  A simpler alternative is
+to let nearest-neighbor dispersal happen a specified number of times per
+generation.
+
+(d) Dispersal is symmetric: the probability of moving left is the same as the
+probability of moving right.
+
+(e) Competition is symmetric.  There are two ways to introduce asymmetry: by
+species identity (e.g. individuals of species 1 have a stronger effect on
+individuals of species 2 than vice versa or on each other) or by phenotype (e.g.
+larger-z individuals have a larger effect on smaller-z individuals, regardless
+of their species).  The former would be implemented through the competition
+coefficients, and the latter would be done with a different competition
+distribution (like Case and Taper's kappa).
+
+(f) The optimum phenotype function, theta(x), so far is just a straight line,
+but it could be made into anything.  Modifications can be hard-coded in
+optimum.c, or a few general cases can be specified there and appropriate
+parameters created.
+
+(g) Selection must be weak, meaning that the cline can't be too steep,
+dispersal too far, or the selection function too narrow.  Changing this
+requires obtaining the Wrightian fitness numerically rather than through the
+current analytical approximation.  This would slow the analysis down a bit, but
+it is probably worth doing.
+
+
+Disclaimer
+---------------------------
+
+My older, two-species version of this code was well-tested and gave every
+indication of working properly.  I have only tested this multi-species version
+briefly -- it appears to work fine, but please keep an eye out for weird
+behavior (even with two species, since some of the code had to be re-written).

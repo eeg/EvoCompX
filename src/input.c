@@ -1,3 +1,23 @@
+/**********************************************************************
+ * Copyright 2009 Emma Goldberg
+ * 
+ * This file is part of EvoCompX.
+ * 
+ * EvoCompX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * EvoCompX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with EvoCompX.  If not, see <http://www.gnu.org/licenses/>.
+ *********************************************************************/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -181,9 +201,9 @@ Params *GetParams(int argc, char *argv[])
 
 	if (argc < 2)
 	{
-		fprintf(stderr, "\nEvoCompX requires input parameters.\n"
-		                 "Please see the README and example params.in file "
-		                 "for usage examples and options.\n\n");
+		fprintf(stderr, "\n           *** This is EvoCompX ver 0.1 ***\n"
+		     "  Input parameters are required.  Please see the README and\n"
+		     "  example params.in file for usage examples and options.\n\n");
 		exit(1);
 	}
 
