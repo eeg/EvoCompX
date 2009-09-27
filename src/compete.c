@@ -31,6 +31,39 @@
  ***/
 
 
+/* construct the matrix of competition coefficients */
+void make_alpha(Params *params)
+{
+	FILE *fp;
+	int i, j;
+
+	if (params->alpha_file != 0)
+	{
+		fp = fopen(params->alpha_file, "r");
+		for (i=0; i<params->num_sp; i++)
+		{
+			for (j=0; j<params->num_sp; j++)
+			{
+				if (fscanf(fp, "%lf", &params->alpha[i][j]) != 1)
+				{
+					fprintf(stderr, "Error: invalid input in "
+					                "alpha_file\n");
+					exit(1);
+				}
+			}
+		}
+		fclose(fp);
+	}
+
+	else
+	{
+		for (i=0; i<params->num_sp; i++)
+			for (j=0; j<params->num_sp; j++)
+				params->alpha[i][j] = 1;
+	}
+}
+
+
 void competition_happens(Cell space[][2], int old, Params *params)
 {
 	double nz_new[2];           /* n_new, zbar_new */
@@ -104,16 +137,19 @@ void comp_sel(double nz_new[2], int sp, int i, double opt, Cell space[][2],
 			zbar_other = space[i][old].zbar[osp];
 			n_other = space[i][old].num[osp];
 
-			w_temp += n_other * exp((-1/(4*(p->V_p+p->V_u))) *
-			                         pow(zbar_old-zbar_other, 2));
-			z_temp += n_other * (zbar_old - zbar_other) * 
-			          exp((-1/(4*(p->V_p+p->V_u))) *
-			              pow(zbar_old-zbar_other, 2));
+			w_temp += p->alpha[sp][osp] * n_other * 
+			            exp((-1/(4*(p->V_p+p->V_u))) * 
+			            pow(zbar_old-zbar_other, 2));
+			z_temp += p->alpha[sp][osp] * n_other * 
+			         (zbar_old - zbar_other) * exp((-1/(4*(p->V_p+p->V_u))) *
+			         pow(zbar_old-zbar_other, 2));
 		}
 	}
 
+	/* contains terms for intraspecific and interspecific effects */
 	w_bar = p->r - pow(opt-zbar_old, 2)/(2*p->V_s) - p->V_p/(2*p->V_s) - 
-	        (p->r/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * (n_old + w_temp);
+	       (p->r/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
+	       (p->alpha[sp][sp] * n_old + w_temp);
 
 	nz_new[0] = exp(w_bar) * n_old;
 

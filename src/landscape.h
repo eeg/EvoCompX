@@ -23,9 +23,6 @@
 
 #include "input.h"
 
-#define MAX_NUM_SP 20
-#define MAX_SPACE_SIZE 1000
-
 /*** spatial units on the landscape ***/
 typedef struct cell
 {

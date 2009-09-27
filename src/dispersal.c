@@ -22,6 +22,7 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "input.h"
 #include "dispersal.h"
 
 

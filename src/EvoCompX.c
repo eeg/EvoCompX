@@ -59,12 +59,18 @@ int main(int argc, char *argv[])
 	int t_steps;
 	int recorded;
 
+
 	/*** read in the parameter file ***/
 
 	params = GetParams(argc, argv);
-	/* exits in the line above if parameters are insufficient */
+	/* exits GetParams() if parameters are insufficient */
 
+	/* construct the matrix of competition coefficients */
+	make_alpha(params);
+
+	/* the number of generations to run */
 	t_steps = params->stop_t - params->start_t + 1;
+
 
 	/*** clear the landscape and place initial individuals ***/
 
@@ -92,6 +98,9 @@ int main(int argc, char *argv[])
 	recorded++;
 
 	printf("t = %d\n", params->start_t);
+
+
+	/*** actually run the model ***/
 
 	for (t=1; t<t_steps; t++)
 	{

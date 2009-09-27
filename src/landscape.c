@@ -83,14 +83,14 @@ void initialize_landscape(Cell space[][2], Params *params)
 	{
 		for (sp=0; sp<params->num_sp; sp++)
 		{
-			if(fscanf(num_fp, "%lf", &space[i][0].num[sp]) != 1)
+			if (fscanf(num_fp, "%lf", &space[i][0].num[sp]) != 1)
 			{
-				fprintf(stderr, "Error: invalid input\n");
+				fprintf(stderr, "Error: invalid input in initial_num\n");
 				exit(1);
 			}
-			if(fscanf(zbar_fp, "%lf", &space[i][0].zbar[sp]) != 1)
+			if (fscanf(zbar_fp, "%lf", &space[i][0].zbar[sp]) != 1)
 			{
-				fprintf(stderr, "Error: invalid input\n");
+				fprintf(stderr, "Error: invalid input in initial_zbar\n");
 				exit(1);
 			}
 			space[i][0].ztotal[sp] = space[i][0].num[sp] *

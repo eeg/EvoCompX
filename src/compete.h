@@ -24,6 +24,7 @@
 #include "landscape.h"
 #include "input.h"
 
+void make_alpha(Params *params);
 void competition_happens(Cell space[][2], int old, Params *params);
 void comp_sel(double nz_new[2], int sp, int i, double opt, Cell space[][2],
               int old, Params *p);

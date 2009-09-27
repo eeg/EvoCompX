@@ -1,7 +1,12 @@
-GPL file and comments in each source file (gplify)
-svn export under_svn/ clean_copy/
-version number
-remove -g ?
+Add alpha matrix input for diffuse competition.
+   make_alpha.py  ->  alpha.in
+
+Create CHANGES.
+Increment version number.
+
+Remove -g in dist/ ?
+
+Make sure all the variance parameters are positive.
 
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
 
@@ -9,7 +14,9 @@ For later:
 
 If more species or cells are needed, malloc the space array.
 
-Allow asymmetric competition (competition matrix or kappa)
-   (should be okay as long as phenotype distribution and competition         function are symmetric -- see C&T below Eq13, response1.txt #11, lab book p10; or see Silwood notes about relaxing weak competition assumption) 
+Allow asymmetric competition (competition matrix or kappa) (should be okay as
+long as phenotype distribution and competition function are symmetric -- see
+C&T below Eq13, response1.txt #11, lab book p10; or see Silwood notes about
+relaxing weak competition assumption) 
 
 

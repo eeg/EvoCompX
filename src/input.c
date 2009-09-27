@@ -114,6 +114,12 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 		return -1;
 	}
 
+	parameters->alpha_file = getKeyValuestring(kv, "alpha_file");
+     if (parameters->alpha_file == 0)
+	{
+		fprintf(stderr, "competition matrix not specified, using 1\n");
+	}
+
 	parameters->beta = getKeyValuedouble(kv, "beta");
      if (parameters->beta == KV_FLOATERR)
 	{
