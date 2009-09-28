@@ -1,12 +1,13 @@
 EvoCompX: evolution and competition across space
 
-Version 0.1, Sept 2009
+Version 0.2, Sept 2009
 Emma Goldberg <eeg@umd.edu>
 
 This program implements the model of Case and Taper (2000, AmNat), with some
-extensions.  In particular, any number of species can be used.  The
-phenotype-independent hybridization from Goldberg and Lande (2006) is also
-included.  See the end of this file for major limitations.
+extensions.  In particular, any number of species can be used, and competition
+coefficients can be specified.  The phenotype-independent hybridization from
+Goldberg and Lande (2006) is also included.  See the end of this file for major
+limitations.
 
 
 Step 1: Compile the program
@@ -39,6 +40,9 @@ r, K:             parameters of the logistic growth model
 h2:               heritability
 V_s, V_p, V_u:    variances of the stabilizing selection, phenotypic, and 
                     competition functions
+alpha_file:       a file containing the matrix of competition coefficients,
+                    alpha[row i][col j] = alpha_ij = effect of j on i;
+                    values should be separated by whitespace
 beta:             frequency-independent hybridization
 delta:            probability of dispersal to a neighboring cell
 space_size:       number of spatial cells, currently no more than 1000
@@ -62,6 +66,11 @@ To run the included three-species example:
 
 Generate the initial condition files num.in and zbar.in:
    $ ./make_initial.py
+
+Generate a file with a competition coefficient matrix, alpha.in:
+   $ ./make_alpha.py 0.5
+(If a number is specificed [0.5 here], that will be the value of all the a_ij
+elements.  If no number is given, random values will be chosen.)
 
 Run the program, generating several output files:
    $ ../src/EvoCompX params.in
@@ -93,10 +102,10 @@ in the input file.  This can be useful when using a script to run many
 scenarios.  For example:
    $ ../src/EvoCompX params.in opt_slope=0.4 delta=0.01
 
-Hugely increasing the number of species, number of spatial cells, or
-elapsed time could lead to slow run times.  So best to increase those just
-gradually.  If more than 20 species or 1000 cells are needed, the space array
-must be allocated dynamically.
+Hugely increasing the number of species, number of spatial cells, or elapsed
+time could lead to slow run times.  So best to increase those just gradually.
+If more than 20 species or 1000 cells are needed, the space array must be
+allocated dynamically.
 
 Here are some of the current limitations in the code.  All of these can be
 changed if that would be useful.
@@ -114,12 +123,9 @@ generation.
 (d) Dispersal is symmetric: the probability of moving left is the same as the
 probability of moving right.
 
-(e) Competition is symmetric.  There are two ways to introduce asymmetry: by
-species identity (e.g. individuals of species 1 have a stronger effect on
-individuals of species 2 than vice versa or on each other) or by phenotype (e.g.
-larger-z individuals have a larger effect on smaller-z individuals, regardless
-of their species).  The former would be implemented through the competition
-coefficients, and the latter would be done with a different competition
+(e) Competition is symmetric by phenotype.  To change that (e.g. so larger-z
+individuals have a larger effect on smaller-z individuals than vice versa,
+regardless of their species), one could use a different competition 
 distribution (like Case and Taper's kappa).
 
 (f) The optimum phenotype function, theta(x), so far is just a straight line,

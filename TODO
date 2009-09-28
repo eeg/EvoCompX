@@ -1,11 +1,3 @@
-Add alpha matrix input for diffuse competition.
-   make_alpha.py  ->  alpha.in
-
-Create CHANGES.
-Increment version number.
-
-Remove -g in dist/ ?
-
 Make sure all the variance parameters are positive.
 
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
@@ -20,3 +12,11 @@ C&T below Eq13, response1.txt #11, lab book p10; or see Silwood notes about
 relaxing weak competition assumption) 
 
 
+For packaging versions:
+
+svn export under_svn/ dist/EvoCompX-v0.x
+cd dist/EvoCompX-v0.x
+rm TODO
+vi src/Makefile     # remove -g option from gcc
+cd ..
+tar czvf EvoCompX-v0.x.tar.gz EvoCompX-v0.x/

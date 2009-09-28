@@ -6,7 +6,7 @@
 # Each output file has one row per spatial cell and one column per species.
 #-------------------------------------------------- 
 
-UNDEF = -9999    # this must match the value in input.h
+UNDEF_PHEN = -9999    # this must match the value in input.h
 
 def list_of_lists(n):
 	'''return a list containing n empty lists'''
@@ -43,7 +43,7 @@ for sp in range(num_sp):
 
 		if cell < start[sp] or cell > stop[sp]:
 			num[sp] = num[sp] + [0]
-			zbar[sp] = zbar[sp] + [UNDEF]
+			zbar[sp] = zbar[sp] + [UNDEF_PHEN]
 		else:
 			num[sp] = num[sp] + [abun[sp]]
 			zbar[sp] = zbar[sp] + [ get_optimum(cell) + zoffset[sp] ]

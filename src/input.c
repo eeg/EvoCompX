@@ -207,7 +207,7 @@ Params *GetParams(int argc, char *argv[])
 
 	if (argc < 2)
 	{
-		fprintf(stderr, "\n           *** This is EvoCompX ver 0.1 ***\n"
+		fprintf(stderr, "\n           *** This is EvoCompX ver 0.2 ***\n"
 		     "  Input parameters are required.  Please see the README and\n"
 		     "  example params.in file for usage examples and options.\n\n");
 		exit(1);

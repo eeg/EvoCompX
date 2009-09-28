@@ -1,0 +1,11 @@
+0.2 (27 Sept 2009)
+------------------
+
+Added the matrix of competition coefficients, to allow different strengths of
+inter- and intraspecific competition.
+
+0.1 (24 Sept 2009)
+------------------
+
+Case and Taper (2000) model + many species allowed + phenotype-independent
+hybridization.  Keyvalue for user input.

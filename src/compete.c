@@ -37,6 +37,7 @@ void make_alpha(Params *params)
 	FILE *fp;
 	int i, j;
 
+	/* if the alpha's were provided */
 	if (params->alpha_file != 0)
 	{
 		fp = fopen(params->alpha_file, "r");
@@ -55,6 +56,7 @@ void make_alpha(Params *params)
 		fclose(fp);
 	}
 
+	/* if the alpha's weren't provided, set them all to 1, as in CT2000 */
 	else
 	{
 		for (i=0; i<params->num_sp; i++)
