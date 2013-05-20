@@ -1,5 +1,10 @@
 Don't segfault if .in files are missing.
 
+Better way to handle config files:
+    http://www.hyperrealm.com/libconfig/libconfig_manual.html
+    sudo apt-get install libconfig-dev [got me] libconfig8 libconfig8-dev
+
+
 Put in stuff for kinked or piecewise-linear optimum functions.
 
 If command line options aren't valid variables, print a warning.
