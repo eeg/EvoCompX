@@ -39,3 +39,35 @@ double get_optimum(int cell_num, double slope)
 
 	return opt;
 }
+
+/*--------------------------------------------------
+* // TODO: error checking for kink_stop < space_size
+* double get_optimum(int cell_num, double slope)
+* {
+* 	double opt;
+* 
+* 	int kink_start = 5;
+* 	int kink_stop = 10;
+* 	double kink_steep = 6;    / * how much steeper than the main slope * /
+* 
+* 	if (cell_num < kink_start)
+* 	{
+* 		opt = cell_num * slope;
+* 	}
+* 	
+* 	else if (cell_num > kink_stop)
+* 	{
+* 		opt = slope * kink_start + 
+* 		      slope * kink_steep * (kink_stop - kink_start) + 
+* 		      slope * (cell_num - kink_stop);
+* 	}
+* 	
+* 	else
+* 	{
+* 		opt = slope * kink_start +
+* 		      slope * kink_steep * (cell_num - kink_start);
+* 	}
+* 
+* 	return opt;
+* }
+*--------------------------------------------------*/

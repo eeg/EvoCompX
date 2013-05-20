@@ -22,13 +22,13 @@ def get_optimum(x):
 
 
 num_cells = 100          # landscape size
-num_sp = 3               # number of species
+num_sp = 5               # number of species
 
 # one element for each species; start numbering cells with 0
-start = [0, 25, 99]       # first cell in range where the species is
-stop = [0, 28, 99]        # last cell in range where the species is
-abun = [4.9, 5.0, 5.1]    # abundance in each cell in those ranges
-zoffset = [-0.1, 0, 0.1]  # offset from optimum phenotype
+start = [0, 10, 25, 70, 98]       # first cell in range where the species is
+stop = [1, 11, 26, 71, 99]        # last cell in range where the species is
+abun = [4.8, 4.9, 5.0, 5.1, 5.2]    # abundance in each cell in those ranges
+zoffset = [-0.1, -0.05, 0, 0.05, 0.1]  # offset from optimum phenotype
   # or instead, could give fixed values for initial zbar
 # (if there are many species, could use a loop to generate the above lists)
 

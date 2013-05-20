@@ -223,7 +223,7 @@ Params *GetParams(int argc, char *argv[])
 
 	/* overwrite parameter values with those specified on the command line */
 
-     if (argc > 2) for(i = 2; i < argc; i++)
+     if (argc > 2) for (i = 2; i < argc; i++)
 	{
 		if (argv[i][0] == '=')
 		{

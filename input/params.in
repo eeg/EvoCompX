@@ -1,4 +1,4 @@
-num_species = 3
+num_species = 5
 
 ### biology ###
 
@@ -38,4 +38,4 @@ initial_zbar = zbar.in
 
 record_interval = 1000
 start_t = 0
-stop_t = 10000
+stop_t = 50000
