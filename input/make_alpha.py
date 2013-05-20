@@ -15,7 +15,7 @@ import sys
 import random
 rand = random.Random()
 
-num_sp = 5               # number of species
+num_sp = 3               # number of species
 
 try:
 	a_ij = sys.argv[1]

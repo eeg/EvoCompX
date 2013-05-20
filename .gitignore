@@ -3,3 +3,11 @@ log.txt
 *.swp
 *.o
 src/EvoCompX
+test/*/num?.dat
+test/*/zbar?.dat
+test/*/time.dat
+test/*/*final.dat
+test/*/params.in
+input/alpha.in
+input/num.in
+input/zbar.in

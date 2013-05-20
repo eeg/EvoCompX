@@ -1,0 +1,9 @@
+Compare against code from e34ea373df620535889f3bc8252805d6fd771bb2 ("orig")
+
+Three species.  Asymmetric competition matrix.  Nearest-neighbor dispersal.  Some hybridization.
+
+To perform the test:
+    * Run the code to be tested, producing:
+          num1.dat num2.dat num3.dat zbar1.dat zbar2.dat zbar3.dat
+      - May share num.in and zbar.in and alpha.in
+    * ./check.sh

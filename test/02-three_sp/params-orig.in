@@ -18,7 +18,7 @@ V_u = 40
 alpha_file = alpha.in
 
 # frequency-independent hybridization
-beta = 0.1
+beta = 0.01
 
 # simple dispersal
 delta = 0.1
@@ -36,6 +36,6 @@ initial_zbar = zbar.in
 
 ### record-keeping ###
 
-record_interval = 1000
+record_interval = 5000
 start_t = 0
-stop_t = 50000
+stop_t = 100000
