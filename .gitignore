@@ -1,0 +1,5 @@
+logfile
+log.txt
+*.swp
+*.o
+src/EvoCompX

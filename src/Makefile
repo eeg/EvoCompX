@@ -12,7 +12,7 @@ CC = gcc
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 EvoCompX: ${OBJECTS}
-	${CC} ${LDFLAGS} ${OBJECTS} -o $@
+	${CC} ${OBJECTS} ${LDFLAGS} -o $@
 	
 all: ${TARGETS}
 

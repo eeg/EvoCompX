@@ -1,3 +1,5 @@
+Don't segfault if .in files are missing.
+
 Put in stuff for kinked or piecewise-linear optimum functions.
 
 If command line options aren't valid variables, print a warning.
