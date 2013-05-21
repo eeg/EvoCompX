@@ -122,7 +122,7 @@ void comp_sel(double nz_new[2], int sp, int i, double opt, Cell space[][2],
 {
 	double n_old, n_other;
 	double zbar_old, zbar_other;
-	double w_temp, z_temp, w_bar;
+	double w_temp, z_temp, wz_temp, w_bar;
 	int osp;
 
 	w_temp = 0;
@@ -139,12 +139,11 @@ void comp_sel(double nz_new[2], int sp, int i, double opt, Cell space[][2],
 			zbar_other = space[i][old].zbar[osp];
 			n_other = space[i][old].num[osp];
 
-			w_temp += p->alpha[sp][osp] * n_other * 
-			            exp((-1/(4*(p->V_p+p->V_u))) * 
-			            pow(zbar_old-zbar_other, 2));
-			z_temp += p->alpha[sp][osp] * n_other * 
-			         (zbar_old - zbar_other) * exp((-1/(4*(p->V_p+p->V_u))) *
-			         pow(zbar_old-zbar_other, 2));
+			wz_temp = p->alpha[sp][osp] * n_other * 
+			            exp((-1 / (4 * (p->V_p + p->V_u))) * 
+			            pow(zbar_old - zbar_other, 2));
+			w_temp += wz_temp;
+			z_temp += wz_temp * (zbar_old - zbar_other);
 		}
 	}
 
