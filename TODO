@@ -4,7 +4,6 @@ Better way to handle config files:
     http://www.hyperrealm.com/libconfig/libconfig_manual.html
     sudo apt-get install libconfig-dev [got me] libconfig8 libconfig8-dev
 
-
 Put in stuff for kinked or piecewise-linear optimum functions.
 
 If command line options aren't valid variables, print a warning.
@@ -15,9 +14,9 @@ Make sure all the variance parameters are positive.
 
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
 
-For later:
-
 If more species or cells are needed, malloc the space array.
+
+Stop at equilibrium (define tol), rather than at pre-determined time.
 
 Allow asymmetric competition (competition matrix or kappa) (should be okay as
 long as phenotype distribution and competition function are symmetric -- see

@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 	int recorded;
 
 
-	/*** read in the parameter file ***/
+	/*** read in the parameters ***/
 
 	params = GetParams(argc, argv);
 	/* exits GetParams() if parameters are insufficient */
@@ -71,16 +71,7 @@ int main(int argc, char *argv[])
 	/* the number of generations to run */
 	t_steps = params->stop_t - params->start_t + 1;
 
-
-	/*** clear the landscape and place initial individuals ***/
-
-	initialize_landscape(space, params);
-
-	/* indices for the two copies of the landscape */
-	old = 0;
-	new = 1;
-
-	/*** write the initial condition to the output files ***/
+	/*** prepare the output files ***/
 
 	fp_time = fopen("time.dat", "w");
 	for (sp=0; sp<params->num_sp; sp++)
@@ -93,25 +84,20 @@ int main(int argc, char *argv[])
 	}
 
 	recorded = 0;
-	fprintf(fp_time, "%d\n", params->start_t);
-	record_landscape(fp_num, fp_zbar, space, params, old);
-	recorded++;
-
-	printf("t = %d\n", params->start_t);
 
 
-	/*** actually run the model ***/
+	/*** clear the landscape and place initial individuals ***/
 
-	for (t=1; t<t_steps; t++)
+	initialize_landscape(space, params);
+
+	/* indices for the two copies of the landscape */
+	old = 0;	/* where individuals are at the start/end of each generation */
+	new = 1;  /* where they are after dispersal */
+
+	/*** run the model ***/
+
+	for (t=0; t<t_steps; t++)
 	{
-		/*** dispersal ***/
-		dispersal_happens(space, old, params);
-		/* the updated state is now in new */
-
-		/*** competition, stabilizing selection, hybridization ***/
-		competition_happens(space, new, params);
-		/* the updated state is now in old, ready for the next round */
-
 		/*** record the new state, if it's time to ***/
 		if (t == recorded * params->record_interval)
 		{
@@ -120,6 +106,14 @@ int main(int argc, char *argv[])
 			recorded++;
 			printf("t = %d\n", t + params->start_t);
 		}
+
+		/*** dispersal ***/
+		dispersal_happens(space, old, params);
+		/* the updated state is now in new */
+
+		/*** competition, stabilizing selection, hybridization ***/
+		competition_happens(space, new, params);
+		/* the updated state is now in old, ready for the next round */
 	}
 
 	/* got most of the results now */
