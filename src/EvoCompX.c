@@ -104,12 +104,12 @@ int main(int argc, char *argv[])
 
 	for (t=1; t<t_steps; t++)
 	{
-		/*** competition, stabilizing selection, hybridization ***/
-		competition_happens(space, old, params);
-		/* the updated state is now in new, ready for dispersal */
-
 		/*** dispersal ***/
-		dispersal_happens(space, new, params);
+		dispersal_happens(space, old, params);
+		/* the updated state is now in new */
+
+		/*** competition, stabilizing selection, hybridization ***/
+		competition_happens(space, new, params);
 		/* the updated state is now in old, ready for the next round */
 
 		/*** record the new state, if it's time to ***/
