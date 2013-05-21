@@ -1,0 +1,41 @@
+num_species = 3
+
+### biology ###
+
+# logistic growth
+r = 0.1
+K = 10
+
+# natural selection
+h2 = 0.6
+V_s = 200
+V_p = 1
+
+# competition
+V_u = 40
+# the matrix of competition coefficients gives the effect of [column] on [row]
+# can be generated with make_alpha.py
+alpha_file = alpha.in
+
+# frequency-independent hybridization
+beta = 0.01
+
+# simple dispersal
+delta = 0.1
+
+### landscape ###
+
+space_size = 100
+opt_slope = 0.5
+
+# initial conditions
+# each of these files should have one column per species and one row per cell
+# they can be generated with make_initial.py
+initial_num = num.in
+initial_zbar = zbar.in
+
+### record-keeping ###
+
+record_interval = 5000
+start_t = 0
+stop_t = 100000
