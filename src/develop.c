@@ -18,10 +18,30 @@
  *********************************************************************/
 
 
-#ifndef __OPTIMUM_H__
-#define __OPTIMUM_H__
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
 
-double get_optimum(int cell_num, double slope);
-double get_environment(int cell_num, double slope);
+#include "develop.h"
+#include "optimum.h"
 
-#endif
+/***
+ * development, and the action of plasticity
+ ***/
+
+/* fill in zbar and ztotal, based on abar and num */
+void development_happens(Cell space[][2], int old, Params *params)
+{
+	int i, sp;
+
+	for (i=0; i<params->space_size; i++)
+	{
+		for (sp=0; sp<params->num_sp; sp++)
+		{
+			space[i][old].zbar[sp] = space[i][old].abar[sp] + 
+			     params->bbar * get_environment(i, params->env_slope);
+			space[i][old].ztotal[sp] = space[i][old].num[sp] *
+			                         space[i][old].zbar[sp];
+		}
+	}
+}

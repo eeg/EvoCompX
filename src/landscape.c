@@ -33,8 +33,8 @@
 
 
 /*** write the abundances and mean phenotypes to output files ***/
-void record_landscape(FILE **fp_num, FILE **fp_zbar, Cell space[][2],
-                      Params *params, int old_new)
+void record_landscape(FILE **fp_num, FILE **fp_zbar, FILE **fp_abar, 
+		            Cell space[][2], Params *params, int old_new)
 {
 	int i, sp;
 
@@ -44,12 +44,14 @@ void record_landscape(FILE **fp_num, FILE **fp_zbar, Cell space[][2],
 		{
 			fprintf(fp_num[sp], "%3.3e\t", space[i][old_new].num[sp]);
 			fprintf(fp_zbar[sp], "%3.3e\t", space[i][old_new].zbar[sp]);
+			fprintf(fp_abar[sp], "%3.3e\t", space[i][old_new].abar[sp]);
 		}
 	}
 	for (sp=0; sp<params->num_sp; sp++)
 	{
 		fprintf(fp_num[sp], "\n");
 		fprintf(fp_zbar[sp], "\n");
+		fprintf(fp_abar[sp], "\n");
 	}
 }
 
@@ -57,7 +59,7 @@ void record_landscape(FILE **fp_num, FILE **fp_zbar, Cell space[][2],
 void initialize_landscape(Cell space[][2], Params *params)
 {
 	int i, j, sp;
-	FILE *num_fp, *zbar_fp;
+	FILE *num_fp, *abar_fp;
 
 	/*** clear the landscape ***/
 
@@ -70,6 +72,8 @@ void initialize_landscape(Cell space[][2], Params *params)
 				space[i][j].num[sp] = 0;
 				space[i][j].zbar[sp] = UNDEF_PHEN;
 				space[i][j].ztotal[sp] = 0;
+				space[i][j].abar[sp] = UNDEF_PHEN;
+				space[i][j].atotal[sp] = 0;
 			}
 		}
 	}
@@ -77,7 +81,7 @@ void initialize_landscape(Cell space[][2], Params *params)
 	/*** put in the initial individuals ***/
 
 	num_fp = fopen(params->initial_num, "r");
-	zbar_fp = fopen(params->initial_zbar, "r");
+	abar_fp = fopen(params->initial_abar, "r");
 
 	for (i=0; i<params->space_size; i++)
 	{
@@ -88,16 +92,18 @@ void initialize_landscape(Cell space[][2], Params *params)
 				fprintf(stderr, "Error: invalid input in initial_num\n");
 				exit(1);
 			}
-			if (fscanf(zbar_fp, "%lf", &space[i][0].zbar[sp]) != 1)
+			if (fscanf(abar_fp, "%lf", &space[i][0].abar[sp]) != 1)
 			{
-				fprintf(stderr, "Error: invalid input in initial_zbar\n");
+				fprintf(stderr, "Error: invalid input in initial_abar\n");
 				exit(1);
 			}
-			space[i][0].ztotal[sp] = space[i][0].num[sp] *
-								space[i][0].zbar[sp];
+			space[i][0].atotal[sp] = space[i][0].num[sp] *
+								space[i][0].abar[sp];
+			/* note that zbar and ztotal are taken care of within the
+ 			 * generational loop */
 		}
 	}
 
 	fclose(num_fp);
-	fclose(zbar_fp);
+	fclose(abar_fp);
 }

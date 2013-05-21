@@ -18,10 +18,13 @@ V_u = 40
 alpha_file = alpha.in
 
 # frequency-independent hybridization
-beta = 0.1
+beta = 0.01
 
 # simple dispersal
 delta = 0.1
+
+# constant plasticity
+bbar = 0.1
 
 ### landscape ###
 
@@ -32,10 +35,10 @@ opt_slope = 0.5
 # each of these files should have one column per species and one row per cell
 # they can be generated with make_initial.py
 initial_num = num.in
-initial_zbar = zbar.in
+initial_abar = zbar.in
 
 ### record-keeping ###
 
-record_interval = 1000
+record_interval = 5000
 start_t = 0
-stop_t = 50000
+stop_t = 100000

@@ -29,8 +29,9 @@
  * specify the optimum phenotype over space
  ***/
 
+/* TODO need different slopes for theta and epsilon, i.e., B and C */
 
-/* linear now, but could be anything */
+/* will probably remain linear */
 double get_optimum(int cell_num, double slope)
 {
 	double opt;
@@ -40,9 +41,20 @@ double get_optimum(int cell_num, double slope)
 	return opt;
 }
 
+/* could get fancier than linear */
+double get_environment(int cell_num, double slope)
+{
+	double env;
+
+	env = slope*cell_num;
+
+	return env;
+}
+
 /*--------------------------------------------------
 * // TODO: error checking for kink_stop < space_size
 * double get_optimum(int cell_num, double slope)
+* // should be get_environment instead
 * {
 * 	double opt;
 * 

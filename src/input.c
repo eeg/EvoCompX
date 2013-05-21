@@ -134,6 +134,13 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 		return -1;
 	}
 
+	parameters->bbar = getKeyValuedouble(kv, "bbar");
+     if (parameters->bbar == KV_FLOATERR)
+	{
+		fprintf(stderr, "need to specify plasticity, bbar\n");
+		return -1;
+	}
+
 	/*** landscape ***/
 
 	parameters->space_size = getKeyValueint(kv, "space_size");
@@ -151,6 +158,9 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 		return -1;
 	}
 
+	/* TODO need different slopes for theta and epsilon, i.e., B and C */
+	parameters->env_slope = 1;
+
 	parameters->initial_num = getKeyValuestring(kv, "initial_num");
      if (parameters->initial_num == 0)
 	{
@@ -158,10 +168,10 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 		return -1;
 	}
 
-	parameters->initial_zbar = getKeyValuestring(kv, "initial_zbar");
-     if (parameters->initial_zbar == 0)
+	parameters->initial_abar = getKeyValuestring(kv, "initial_abar");
+     if (parameters->initial_abar == 0)
 	{
-		fprintf(stderr, "need to specify initial phenotypes, initial_zbar\n");
+		fprintf(stderr, "need to specify initial breeding values, initial_abar\n");
 		return -1;
 	}
 

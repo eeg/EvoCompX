@@ -39,16 +39,19 @@ void nearest_neighbor(Cell space[][2], int old, int i, int j,
 {
 	int new = (old+1)%2;
 
-	double n_gain, n_loss, z_gain, z_loss;
+	double n_gain, n_loss, z_gain, z_loss, a_gain, a_loss;
 
 	n_gain = space[j][old].num[sp] * delta;
 	z_gain = n_gain * space[j][old].zbar[sp];
+	a_gain = n_gain * space[j][old].abar[sp];
 
 	n_loss = space[i][old].num[sp] * delta;
 	z_loss = n_loss * space[i][old].zbar[sp];
+	a_loss = n_loss * space[i][old].abar[sp];
 
 	space[i][new].num[sp] += n_gain - n_loss;
 	space[i][new].ztotal[sp] += z_gain - z_loss;
+	space[i][new].atotal[sp] += a_gain - a_loss;
 }
 
 
@@ -66,6 +69,8 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 			space[i][new].num[sp] = space[i][old].num[sp];
 			space[i][new].zbar[sp] = space[i][old].zbar[sp];
 			space[i][new].ztotal[sp] = space[i][old].ztotal[sp];
+			space[i][new].abar[sp] = space[i][old].abar[sp];
+			space[i][new].atotal[sp] = space[i][old].atotal[sp];
 		}
 	}
 
@@ -86,14 +91,22 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 			                 params->space_size-2, params->delta, sp);
 
 
-			/* update mean phenotype, i.e. get zbar from ztotal */
+			/* update mean phenotype, i.e. get zbar from ztotal; 
+			 * same for mean breeding value */
 			for (i=0; i<params->space_size; i++)
 			{
 				if (space[i][new].num[sp] == 0)
+				{
 					space[i][new].zbar[sp] = UNDEF_PHEN;
+					space[i][new].abar[sp] = UNDEF_PHEN;
+				}
 				else
+				{
 					space[i][new].zbar[sp] = space[i][new].ztotal[sp] / 
 										space[i][new].num[sp];
+					space[i][new].abar[sp] = space[i][new].atotal[sp] / 
+										space[i][new].num[sp];
+				}
 			}
 		}
 	}

@@ -35,6 +35,7 @@
 #include <string.h>
 
 #include "compete.h"
+#include "develop.h"
 #include "dispersal.h"
 #include "landscape.h"
 #include "optimum.h"
@@ -51,7 +52,8 @@ int main(int argc, char *argv[])
 	int old, new;
 
 	/* output files */
-	FILE *fp_time, *fp_num[MAX_NUM_SP], *fp_zbar[MAX_NUM_SP];
+	FILE *fp_time;
+	FILE *fp_num[MAX_NUM_SP], *fp_zbar[MAX_NUM_SP], *fp_abar[MAX_NUM_SP];
 	char str[1000];
 
 	int i, t, sp;
@@ -63,7 +65,7 @@ int main(int argc, char *argv[])
 	/*** read in the parameters ***/
 
 	params = GetParams(argc, argv);
-	/* exits GetParams() if parameters are insufficient */
+	/* exits from GetParams() if parameters are insufficient */
 
 	/* construct the matrix of competition coefficients */
 	make_alpha(params);
@@ -81,10 +83,12 @@ int main(int argc, char *argv[])
 
 		sprintf(str, "zbar%d.dat", sp+1);
 		fp_zbar[sp] = fopen(str, "w");
+
+		sprintf(str, "abar%d.dat", sp+1);
+		fp_abar[sp] = fopen(str, "w");
 	}
 
 	recorded = 0;
-
 
 	/*** clear the landscape and place initial individuals ***/
 
@@ -93,25 +97,30 @@ int main(int argc, char *argv[])
 	/* indices for the two copies of the landscape */
 	old = 0;	/* where individuals are at the start/end of each generation */
 	new = 1;  /* where they are after dispersal */
-
+	
 	/*** run the model ***/
 
 	for (t=0; t<t_steps; t++)
 	{
-		/*** record the new state, if it's time to ***/
+		/* plasticity/development */
+		development_happens(space, old, params);
+		/* the current state is still in old, but now complete with zbar 
+ 		 * and ztotal */
+
+		/* record the current state, if it's time to */
 		if (t == recorded * params->record_interval)
 		{
 			fprintf(fp_time, "%d\n", t + params->start_t);
-			record_landscape(fp_num, fp_zbar, space, params, old);
+			record_landscape(fp_num, fp_zbar, fp_abar, space, params, old);
 			recorded++;
 			printf("t = %d\n", t + params->start_t);
 		}
 
-		/*** dispersal ***/
+		/* dispersal */
 		dispersal_happens(space, old, params);
 		/* the updated state is now in new */
 
-		/*** competition, stabilizing selection, hybridization ***/
+		/* competition, stabilizing selection, hybridization */
 		competition_happens(space, new, params);
 		/* the updated state is now in old, ready for the next round */
 	}

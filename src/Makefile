@@ -1,5 +1,5 @@
-SOURCE  = EvoCompX.c compete.c dispersal.c landscape.c optimum.c keyvalue.c input.c
-HEADERS = compete.h dispersal.h landscape.h optimum.h keyvalue.h input.h
+SOURCE  = EvoCompX.c compete.c develop.c dispersal.c landscape.c optimum.c keyvalue.c input.c
+HEADERS = compete.h develop.h dispersal.h landscape.h optimum.h keyvalue.h input.h
 OBJECTS = ${SOURCE:.c=.o}
 TARGETS = EvoCompX
 

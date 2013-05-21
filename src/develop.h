@@ -18,10 +18,12 @@
  *********************************************************************/
 
 
-#ifndef __OPTIMUM_H__
-#define __OPTIMUM_H__
+#ifndef __DEVELOP_H__
+#define __DEVELOP_H__
 
-double get_optimum(int cell_num, double slope);
-double get_environment(int cell_num, double slope);
+#include "landscape.h"
+#include "input.h"
+
+void development_happens(Cell space[][2], int old, Params *params);
 
 #endif

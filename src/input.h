@@ -45,12 +45,14 @@ typedef struct
 	double delta;   /* probability of dispersal into neighboring cell        */
 	const char *alpha_file;  /* file with matrix of competition coefficients */
 	double alpha[MAX_NUM_SP][MAX_NUM_SP];  /* the actual competition matrix  */
+	double bbar;    /* degree of plasticity                                  */
 
 	/* landscape */
 	int space_size;             /* number of cells, x (1-D)                  */
 	double opt_slope;           /* slope of optimum phenotype func, theta(x) */
+	double env_slope;           /* slope of environment func, epsilon(x)     */
 	const char *initial_num;    /* files with initial conditions...          */
-	const char *initial_zbar;   /* ...for n and zbar                         */
+	const char *initial_abar;   /* ...for n and abar                         */
 
 	/* record-keeping */
 	int start_t;

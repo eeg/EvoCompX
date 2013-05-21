@@ -5,9 +5,12 @@ log.txt
 src/EvoCompX
 test/*/num?.dat
 test/*/zbar?.dat
+test/*/abar?.dat
 test/*/time.dat
 test/*/*final.dat
 test/*/params.in
 input/alpha.in
 input/num.in
 input/zbar.in
+input/*.dat
+input/results.pdf

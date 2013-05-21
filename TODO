@@ -1,8 +1,10 @@
-Don't segfault if .in files are missing.
-
 Better way to handle config files:
     http://www.hyperrealm.com/libconfig/libconfig_manual.html
     sudo apt-get install libconfig-dev [got me] libconfig8 libconfig8-dev
+
+Replace tabs with 4 spaces.  (Change .vim, too.)
+
+Don't segfault if .in files are missing.
 
 Put in stuff for kinked or piecewise-linear optimum functions.
 
