@@ -12,59 +12,19 @@ mycol <- c(myorange, mygreen, myblue, mypurple)
 setwd("/home/emma/plastic-cd/EvoCompX/input/")
 
 # slopes of the environmental and optimum phenotype functions
-# (could get from params file instead)
 env.slope <- 1
 opt.slope <- 0.5
 bbar <- 0.1
 abar.slope <- env.slope * (opt.slope - bbar)
 
+# number of species
+nsp <- 2
+
+# (could get above from params file instead)
+
 # open an output file
 pdf("results.pdf", width=7, height=14)
 par(mfrow=c(3,1))
-
-
-#--------------------------------------------------
-# The final state of the system
-#-------------------------------------------------- 
-
-dat.num <- read.table("num_final.dat")
-dat.zbar <- read.table("zbar_final.dat")
-dat.abar <- read.table("abar_final.dat")
-
-# number of species
-nsp <- ncol(dat.num)
-
-dat <- cbind(dat.num, dat.zbar, dat.abar)
-names(dat) <- paste(c(rep("num", nsp), rep("zbar", nsp), rep("abar", nsp)),
-                    rep(as.character(seq(nsp)), 2), sep="")
-
-x <- seq(nrow(dat)) - 1
-
-# number of individuals
-plot(x, dat[["num1"]], type="l", lwd=3, col=mycol[1], xlab="spatial position",
-        ylab="number of individuals")
-if (nsp > 1)
-{
-    for (i in 2:nsp)
-    {
-        lines(x, dat[[paste("num", i, sep="")]], lwd=3, col=mycol[i])
-    }
-}
-title("final state")
-
-# mean phenotype
-plot(x, x*env.slope*opt.slope, type="l", xlab="spatial position", ylab="mean phenotype")
-for (i in 1:nsp)
-{
-    lines(x, dat[[paste("zbar", i, sep="")]], lwd=3, col=mycol[i])
-}
-
-# mean breeding value
-plot(x, x*abar.slope, type="l", xlab="spatial position", ylab="mean breeding value")
-for (i in 1:nsp)
-{
-    lines(x, dat[[paste("abar", i, sep="")]], lwd=3, col=mycol[i])
-}
 
 #--------------------------------------------------
 # Changes over time
@@ -114,5 +74,76 @@ for (i in seq(nsp))
     lines(x, abar[[i]][,tm], lwd=3, col=mycol[i])
     matlines(x, abar[[i]][], col=mycol[i], lty=lty)
 }
+
+#--------------------------------------------------
+# The final state of the system
+#-------------------------------------------------- 
+
+dat.num <- read.table("num_final.dat")
+dat.zbar <- read.table("zbar_final.dat")
+dat.abar <- read.table("abar_final.dat")
+
+dat <- cbind(dat.num, dat.zbar, dat.abar)
+names(dat) <- paste(c(rep("num", nsp), rep("zbar", nsp), rep("abar", nsp)),
+                    rep(as.character(seq(nsp)), 2), sep="")
+
+x <- seq(nrow(dat)) - 1
+
+# number of individuals
+plot(x, dat[["num1"]], type="l", lwd=3, col=mycol[1], xlab="spatial position",
+        ylab="number of individuals")
+if (nsp > 1)
+{
+    for (i in 2:nsp)
+    {
+        lines(x, dat[[paste("num", i, sep="")]], lwd=3, col=mycol[i])
+    }
+}
+title("final state")
+
+# mean phenotype
+plot(x, x*env.slope*opt.slope, type="l", xlab="spatial position", ylab="mean phenotype")
+for (i in 1:nsp)
+{
+    lines(x, dat[[paste("zbar", i, sep="")]], lwd=3, col=mycol[i])
+}
+
+# mean breeding value
+plot(x, x*abar.slope, type="l", xlab="spatial position", ylab="mean breeding value")
+for (i in 1:nsp)
+{
+    lines(x, dat[[paste("abar", i, sep="")]], lwd=3, col=mycol[i])
+}
+
+#--------------------------------------------------
+# Asymmetry of displacement
+#--------------------------------------------------
+
+if (nsp == 2)
+{
+
+    x <- seq(nrow(dat)) - 1
+    x0 <- which.min(abs(dat.num[,1] - dat.num[,2]))
+
+    opt.z <- x * env.slope * opt.slope
+    z1 <- dat.zbar[,1]
+    z2 <- dat.zbar[,2]
+
+    plot(x, abs((opt.z - z1) - (z2 - opt.z)), type="l", lwd=3, main="mean phenotype diff")
+
+    plot(x, opt.z - z1, type="l", lwd=3, col=mycol[1], main="mean phenotype clines")
+    lines(x+2*x0-100, rev(z2 - opt.z), lwd=3, col=mycol[2])
+    abline(h=0)
+
+
+    opt.a <- x * abar.slope
+    a1 <- dat.abar[,1]
+    a2 <- dat.abar[,2]
+
+    plot(x, opt.a - a1, type="l", lwd=3, col=mycol[1], main="mean breeding value clines")
+    lines(x+2*x0-100, rev(a2 - opt.a), lwd=3, col=mycol[2])
+    abline(h=0)
+}
+
 
 junk <- dev.off()  # suppress useless message
