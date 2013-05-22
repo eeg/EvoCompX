@@ -6,6 +6,8 @@
 # Each output file has one row per spatial cell and one column per species.
 #-------------------------------------------------- 
 
+# TODO: pull params from same input file that EvoCompX uses
+
 UNDEF_PHEN = -9999    # this must match the value in input.h
 
 def list_of_lists(n):
@@ -15,42 +17,42 @@ def list_of_lists(n):
 		a.append([])
 	return a
 
-def get_optimum(x):
-	'''return the optimum phenotype for cell x'''
-	opt_slope = 0.5
-	return x * opt_slope
+def get_best_abar(x):
+    '''return the optimum mean breeding value for cell x'''
+    B = 0.5           # slope of the optimum phenotype function
+    C = 1             # slope of the environment function
+    bbar = 0.1        # mean plasticity
+    return (B - bbar) * C * x
 
 
 num_cells = 100          # landscape size
-num_sp = 3               # number of species
+num_sp = 2               # number of species
 
 # one element for each species; start numbering cells with 0
-start = [0, 30, 85]       # first cell in range where the species is
-stop =  [5, 40, 90]        # last cell in range where the species is
-abun = [4.9, 5.0, 5.2]    # abundance in each cell in those ranges
-zoffset = [-0.1, 0.05, 0.1]  # offset from optimum phenotype
-  # or instead, could give fixed values for initial zbar
-# (if there are many species, could use a loop to generate the above lists)
+start = [0, 90]          # first cell in range where the species is
+stop  = [9, 99]          # last cell in range where the species is
+abun  = [4.0, 6.0]       # abundance in each cell in those ranges
+abar_off = [-0.5, 0.3]  # offset from optimum mean breeding value
 
 num_fp = open("num.in", "w")
-zbar_fp = open("zbar.in", "w")
+abar_fp = open("abar.in", "w")
 
-num = list_of_lists(num_sp)
-zbar = list_of_lists(num_sp)
+num  = list_of_lists(num_sp)
+abar = list_of_lists(num_sp)
 
 for sp in range(num_sp):
 	for cell in range(num_cells):
 
 		if cell < start[sp] or cell > stop[sp]:
 			num[sp] = num[sp] + [0]
-			zbar[sp] = zbar[sp] + [UNDEF_PHEN]
+			abar[sp] = abar[sp] + [UNDEF_PHEN]
 		else:
 			num[sp] = num[sp] + [abun[sp]]
-			zbar[sp] = zbar[sp] + [ get_optimum(cell) + zoffset[sp] ]
+			abar[sp] = abar[sp] + [ get_best_abar(cell) + abar_off[sp] ]
 
 for cell in range(num_cells):
 	for sp in range(num_sp):
 		num_fp.write("%f\t" % num[sp][cell])
-		zbar_fp.write("%f\t" % zbar[sp][cell])
+		abar_fp.write("%f\t" % abar[sp][cell])
 	num_fp.write("\n")
-	zbar_fp.write("\n")
+	abar_fp.write("\n")

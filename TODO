@@ -4,7 +4,11 @@ Better way to handle config files:
 
 Replace tabs with 4 spaces.  (Change .vim, too.)
 
+Put fp_num, fp_zbar, fp_abar into a 2D array.
+
 Don't segfault if .in files are missing.
+
+Allow num_species = 1.
 
 Put in stuff for kinked or piecewise-linear optimum functions.
 

@@ -1,4 +1,4 @@
-num_species = 3
+num_species = 2
 
 ### biology ###
 
@@ -15,10 +15,11 @@ V_p = 1
 V_u = 40
 # the matrix of competition coefficients gives the effect of [column] on [row]
 # can be generated with make_alpha.py
-alpha_file = alpha.in
+# (if not provided, assumes all alpha=1)
+#alpha_file = alpha.in
 
 # frequency-independent hybridization
-beta = 0.01
+beta = 0
 
 # simple dispersal
 delta = 0.1
@@ -35,10 +36,10 @@ opt_slope = 0.5
 # each of these files should have one column per species and one row per cell
 # they can be generated with make_initial.py
 initial_num = num.in
-initial_abar = zbar.in
+initial_abar = abar.in
 
 ### record-keeping ###
 
-record_interval = 5000
+record_interval = 500
 start_t = 0
-stop_t = 100000
+stop_t = 10000

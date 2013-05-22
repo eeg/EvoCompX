@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	old = 0;	/* where individuals are at the start/end of each generation */
 	new = 1;  /* where they are after dispersal */
 	
-	/*** run the model ***/
+	/*** run the model: the generational loop ***/
 
 	for (t=0; t<t_steps; t++)
 	{
@@ -131,13 +131,16 @@ int main(int argc, char *argv[])
 	{
 		fclose(fp_num[sp]);
 		fclose(fp_zbar[sp]);
+		fclose(fp_abar[sp]);
 	}
 
 	/*** record the final state ***/
 
 	fp_num[0] = fopen("num_final.dat", "w");
 	fp_zbar[0] = fopen("zbar_final.dat", "w");
+	fp_abar[0] = fopen("abar_final.dat", "w");
 
+	development_happens(space, old, params);
 	for (i=0; i<params->space_size; i++)
 	{
 		for (sp=0; sp<params->num_sp; sp++)
@@ -147,10 +150,15 @@ int main(int argc, char *argv[])
 		for (sp=0; sp<params->num_sp; sp++)
 			fprintf(fp_zbar[0], "%e\t", space[i][old].zbar[sp]); 
 		fprintf(fp_zbar[0], "\n");
+
+		for (sp=0; sp<params->num_sp; sp++)
+			fprintf(fp_abar[0], "%e\t", space[i][old].abar[sp]); 
+		fprintf(fp_abar[0], "\n");
 	}
 
 	fclose(fp_num[0]);
 	fclose(fp_zbar[0]);
+	fclose(fp_abar[0]);
 
 	FreeParams(params);
 
