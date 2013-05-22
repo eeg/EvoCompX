@@ -119,6 +119,15 @@ for (i in 1:nsp)
 # Asymmetry of displacement
 #--------------------------------------------------
 
+# These are a bit confusing.  There must be a clearer way to look at asymmetry.
+# Also, there must be a way that doesn't assume the optimum is known.  
+#
+# Probably need to compare sympatry with allopatry.  But comparing slopes
+# assumes that the gradient is linear.
+#
+# Or maybe something with abundances?  Work out expected amount of displacement
+# for given abundance difference, and look for deviations from that?
+
 if (nsp == 2)
 {
 
