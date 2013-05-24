@@ -127,12 +127,37 @@ for (i in 1:nsp)
 #
 # Or maybe something with abundances?  Work out expected amount of displacement
 # for given abundance difference, and look for deviations from that?
+# Old standby instead is dominance-divergence plot.
+
+# Dominance-divergence plot
+plot.dom.div <- function(n1, n2, z1, z2, ylab.type)
+{
+    dom <- log(n1/n2)
+    xlab <- "ln(num1/num2)"
+
+    if (sum(z1) > sum(z2))
+    {
+        div <- z1 - z2
+        ylab <- sprintf("%s%d - %s%d", ylab.type, 1, ylab.type, 2)
+    } else {
+        div <- z2 - z1
+        ylab <- sprintf("%s%d - %s%d", ylab.type, 2, ylab.type, 1)
+    }
+
+    x0 <- which.min(div)
+    x1 <- min(abs(c(1,100) - x0))
+    i <- seq(x0-x1, x0+x1)
+
+    plot(dom[i], div[i], xlab=xlab, ylab=ylab, type="l", lwd=3, main="dominance-divergence")
+    abline(v=0, lty=2)
+}
 
 if (nsp == 2)
 {
-
     x <- seq(nrow(dat)) - 1
     x0 <- which.min(abs(dat.num[,1] - dat.num[,2]))
+
+    # mean phenotype
 
     opt.z <- x * env.slope * opt.slope
     z1 <- dat.zbar[,1]
@@ -144,14 +169,21 @@ if (nsp == 2)
     lines(x+2*x0-100, rev(z2 - opt.z), lwd=3, col=mycol[2])
     abline(h=0)
 
+    plot.dom.div(dat.num[,1], dat.num[,2], z1, z2, "zbar")
+
+    # mean breeding value
 
     opt.a <- x * abar.slope
     a1 <- dat.abar[,1]
     a2 <- dat.abar[,2]
 
+    plot(x, abs((opt.a - a1) - (a2 - opt.a)), type="l", lwd=3, main="mean breeding value diff")
+
     plot(x, opt.a - a1, type="l", lwd=3, col=mycol[1], main="mean breeding value clines")
     lines(x+2*x0-100, rev(a2 - opt.a), lwd=3, col=mycol[2])
     abline(h=0)
+
+    plot.dom.div(dat.num[,1], dat.num[,2], a1, a2, "abar")
 }
 
 
