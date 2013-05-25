@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
+#include <glib.h>
 
 #include "keyvalue.h"
 
@@ -36,7 +36,7 @@ struct KeyValue *newKeyValue()
 {
 	struct KeyValue *p;
 
-	p = (struct KeyValue *)malloc(sizeof(struct KeyValue));
+	p = g_new(struct KeyValue, 1);
 	p->nparms = 0;
 
 	return p;
@@ -50,17 +50,56 @@ void deleteKeyValue(struct KeyValue *p)
 	
 	for(i = 0; i < p->nparms; i++)
 	{
-		free(p->key[i]);
-		free(p->value[i]);
+		g_free(p->key[i]);
+		g_free(p->value[i]);
 	}
-	free(p);
+	g_free(p);
 }
 
 void KeyValueaddparm(struct KeyValue *p, const char *key, const char *value)
 {
-	p->key[p->nparms]   = strdup(key);
-	p->value[p->nparms] = strdup(value);
+	p->key[p->nparms]   = g_strdup(key);
+	p->value[p->nparms] = g_strdup(value);
 	p->nparms++;
+}
+
+void KeyValueupdateparm(struct KeyValue *p, const char *key, const char *value)
+{
+	int i;
+
+	i = KeyValuekeyindex(p, key);
+	if(i >= 0)
+	{
+		g_free(p->value[i]);
+		p->value[i] = g_strdup(value);
+	}
+	else
+	{
+		p->key[p->nparms]   = g_strdup(key);
+		p->value[p->nparms] = g_strdup(value);
+		p->nparms++;
+	}
+}
+
+void KeyValueupdateparmdouble(struct KeyValue *p, const char *key, double value)
+{
+	int i;
+	char v[100];
+
+	sprintf(v, "%e", value);
+
+	i = KeyValuekeyindex(p, key);
+	if(i >= 0)
+	{
+		g_free(p->value[i]);
+		p->value[i] = g_strdup(v);
+	}
+	else
+	{
+		p->key[p->nparms]   = g_strdup(key);
+		p->value[p->nparms] = g_strdup(v);
+		p->nparms++;
+	}
 }
 
 struct KeyValue *loadKeyValue(const char *filename)
@@ -68,8 +107,7 @@ struct KeyValue *loadKeyValue(const char *filename)
 	struct KeyValue *p;
 	FILE *in;
 	int i;
-	int eq;
-	char str[1000], K[200], V[200];
+	char str[1000], K[500], V[500]; //, dummy[500];
 
 	if(strcmp(filename, "-") == 0) in = stdin;
 	else in = fopen(filename, "r");
@@ -84,30 +122,52 @@ struct KeyValue *loadKeyValue(const char *filename)
 
 	while(1)
 	{
-		if(fgets(str, 999, in) == 0)
-		{
-			break;
-		}
+		int q;
+
+		if(fgets(str, 999, in) == 0);
 		if(feof(in)) break;
-		if(str[0] == 0) continue;
-		eq = 0;
 		for(i = 0; str[i] != 0; i++)
 		{
 			if(str[i] == '#') str[i] = 0;
-			else if(str[i] == '=' && eq == 0) 
-			{
-				str[i] = ' ';
-				eq = 1;
-			}
+			else if(str[i] == '=') str[i] = ' ';
 		}
-		if(sscanf(str, "%s %s\n", K, V) != 2) continue;
-		if(isdigit(K[0])) continue;
-		KeyValueaddparm(p, K, V);
+		for(i--; str[i] <= ' '; i--);
+		
+		/* remove trailing whitespace */
+		str[i+1] = 0;
+		if(str[0] == 0) continue;
+
+		/* if(sscanf(str, "%s %s %s\n", K, V, dummy) != 2) continue;
+		 * KeyValueupdateparm(p, K, V); */
+		/* allow space separating vector elements */
+		if(sscanf(str, "%s %n%s", K, &q, V) != 2) continue;
+		while(str[q] == ' ')
+		{
+			++q;
+		}
+
+		KeyValueupdateparm(p, K, str+q);
 	}
 
 	if(strcmp(filename, "-") != 0) fclose(in);
 	
 	return p;
+}
+
+int saveKeyValue(const struct KeyValue *kv, const char *filename)
+{
+	int i;
+	FILE *out;
+
+	out = fopen(filename, "w");
+	if(!out) return 0;
+
+	for(i = 0; i < kv->nparms; i++)
+		fprintf(out, "%s = %s\n", kv->key[i], kv->value[i]);
+	
+	fclose(out);
+
+	return 1;
 }
 
 /* return -1 if not in the list of keys */
@@ -136,6 +196,14 @@ double getKeyValuedouble(const struct KeyValue *p, const char *key)
 	if(i < 0) return KV_FLOATERR;
 	return atof(p->value[i]);
 }
+
+Vector getKeyValueVector(const struct KeyValue *p, const char *key)
+{
+	int i = KeyValuekeyindex(p, key);
+
+	if(i < 0) return 0;
+	return newVectorfromstring(p->value[i]);
+}
  
 const char *getKeyValuestring(const struct KeyValue *p, const char *key)
 {
@@ -150,5 +218,5 @@ void printKeyValue(const struct KeyValue *p)
 	int i;
 
 	for(i = 0; i < p->nparms; i++)
-		printf("KV: %s = %s\n", p->key[i], p->value[i]);
+		printf("  %s = %s\n", p->key[i], p->value[i]);
 }
