@@ -21,8 +21,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 
 #include "input.h"
+#include "vector-sm.h"
 #include "keyvalue.h"
 #include "landscape.h"
 
@@ -49,6 +51,8 @@ Params *NewParams()
 
 void FreeParams(Params *params)
 {
+	if (params->r != NULL)
+		deleteVector(params->r);
 	free(params);
 }
 
@@ -70,11 +74,16 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 
 	/*** biology ***/
 
-	parameters->r = getKeyValuedouble(kv, "r");
-     if (parameters->r == KV_FLOATERR)
+	parameters->r = getKeyValueVector(kv, "r");
+     if (parameters->r == 0)
 	{
 		fprintf(stderr, "need to specify growth rate, r\n");
 		return -1;
+	}
+	if (VectorSize(parameters->r) != 1 && VectorSize(parameters->r) != parameters->num_sp)
+	{
+		fprintf(stderr, "invalid number of values for growth rate, r\n");
+		return ERROR;
 	}
 
 	parameters->K = getKeyValuedouble(kv, "K");
@@ -263,5 +272,36 @@ Params *GetParams(int argc, char *argv[])
 		exit(1);
 	}
 
+	/* convert any scalar parameters into a vector of length num_species */
+	VectorizeParams(parameters);
+
 	return parameters;
+}
+
+void VectorizeParams(Params *p)
+{
+	int nsp = p->num_sp;
+
+	if (VectorSize(p->r) == 1)
+	{
+		p->r = VecPar(p->r, nsp);
+	}
+}
+
+/* v has length 1, vn has length n */
+Vector VecPar(Vector v, int n)
+{
+	double x = v[0];
+	Vector vn;
+	int i;
+
+	deleteVector(v);
+	vn = newVector(n);
+
+	for (i=0; i<n; i++)
+	{
+		vn[i] = x;
+	}
+
+	return (vn);
 }

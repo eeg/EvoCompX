@@ -1,9 +1,35 @@
+/**********************************************************************
+ * Copyright 2009 Emma Goldberg
+ * 
+ * This file is part of EvoCompX.
+ * 
+ * EvoCompX is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * EvoCompX is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with EvoCompX.  If not, see <http://www.gnu.org/licenses/>.
+ *********************************************************************/
+
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <glib.h>
 #include "vector-sm.h"
+
+
+/***
+ * written by Walter Brisken
+ * used in keyvalue.c
+ ***/
 
 static int totalvectordata = 0;
 
@@ -64,3 +90,8 @@ int stringtoVector(const char *str, Vector v)
 	return i;
 }
 
+void deleteVector(Vector v)
+{
+	totalvectordata -= VectorSize(v);
+	g_free(v-1);
+}

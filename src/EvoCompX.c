@@ -33,12 +33,14 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <glib.h>
 
 #include "compete.h"
 #include "develop.h"
 #include "dispersal.h"
 #include "landscape.h"
 #include "optimum.h"
+#include "vector-sm.h"
 #include "keyvalue.h"
 #include "input.h"
 

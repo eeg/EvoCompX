@@ -27,6 +27,9 @@
 #define MAX_NUM_SP 20
 #define MAX_SPACE_SIZE 1000
 
+#define ERROR -1
+
+#include "vector-sm.h"
 #include "keyvalue.h"
 
 typedef struct
@@ -35,7 +38,7 @@ typedef struct
 	int num_sp;
 
 	/* biology */
-	double r;       /* growth rate                                           */
+	Vector r;       /* growth rate                                           */
 	double K;       /* carrying capacity, per cell                           */
 	double h2;      /* heritability, h^2                                     */
 	double V_s;     /* variance of stabilizing selection func, \sigma_s^2    */
@@ -65,5 +68,7 @@ Params *NewParams();
 void FreeParams(Params *params);
 int AcquireParams(struct KeyValue *kv, Params *parameters);
 Params *GetParams(int argc, char *argv[]);
+void VectorizeParams(Params *p);
+Vector VecPar(Vector v, int n);
 
 #endif

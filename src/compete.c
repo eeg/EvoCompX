@@ -156,8 +156,8 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 	}
 
 	/* contains terms for intraspecific and interspecific effects */
-	w_bar = p->r - pow(opt-zbar_old, 2)/(2*p->V_s) - p->V_p/(2*p->V_s) - 
-	       (p->r/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
+	w_bar = p->r[sp] - pow(opt-zbar_old, 2)/(2*p->V_s) - p->V_p/(2*p->V_s) - 
+	       (p->r[sp]/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
 	       (p->alpha[sp][sp] * n_old + w_temp);
 
 	/* population size changes */
@@ -165,7 +165,7 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 
 	/* mean breeding value changes */
 	nza_new[2] = space[i][old].abar[sp] + p->h2 * p->V_p * (
-			(opt-zbar_old)/p->V_s + p->r/(2*p->K) * 
+			(opt-zbar_old)/p->V_s + p->r[sp]/(2*p->K) * 
 			sqrt(p->V_u)/pow(p->V_p+p->V_u, 1.5) * z_temp
 			);
 
