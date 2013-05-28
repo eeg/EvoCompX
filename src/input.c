@@ -89,14 +89,10 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	if (CheckParam(parameters->h2, nsp, "heritability, h2") == ERROR)
 		return ERROR;
 
-	parameters->V_p = getKeyValuedouble(kv, "V_p");
-	parameters->V_u = getKeyValuedouble(kv, "V_u");
-
 	parameters->V_s = getKeyValueVector(kv, "V_s");
 	if (CheckParam(parameters->V_s, nsp, "variance of stabilizing selection, V_s") == ERROR)
 		return ERROR;
 
-/*
 	parameters->V_p = getKeyValueVector(kv, "V_p");
 	if (CheckParam(parameters->V_p, nsp, "phenotypic variance, V_p") == ERROR)
 		return ERROR;
@@ -104,7 +100,6 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->V_u = getKeyValueVector(kv, "V_u");
 	if (CheckParam(parameters->V_u, nsp, "variance of competition function, V_u") == ERROR)
 		return ERROR;
-*/
 
 	parameters->alpha_file = getKeyValuestring(kv, "alpha_file");
      if (parameters->alpha_file == 0)
@@ -117,7 +112,6 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	{
 		/* default is no hybridization */
 		parameters->beta = newVector(1);
-		// default is no hybridization
 		parameters->beta[0] = 0;
 	}
 	else
@@ -297,13 +291,11 @@ void VectorizeParams(Params *p)
 	if (VectorSize(p->V_s) == 1)
 		p->V_s = VecPar(p->V_s, nsp);
 
-/*
 	if (VectorSize(p->V_p) == 1)
 		p->V_p = VecPar(p->V_p, nsp);
 
 	if (VectorSize(p->V_u) == 1)
 		p->V_u = VecPar(p->V_u, nsp);
-*/
 
 	if (VectorSize(p->beta) == 1)
 		p->beta = VecPar(p->beta, nsp);
@@ -340,10 +332,8 @@ void PrintParams(Params *p)
 	printf("K = ");     printVector(p->K);
 	printf("h2 = ");    printVector(p->h2);
 	printf("V_s = ");   printVector(p->V_s);
-/*
 	printf("V_p = ");   printVector(p->V_p);
 	printf("V_u = ");   printVector(p->V_u);
-*/
 	printf("beta = ");  printVector(p->beta);
 	printf("delta = "); printVector(p->delta);
 	printf("bbar = ");  printVector(p->bbar);

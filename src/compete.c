@@ -131,7 +131,7 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 {
 	double n_old, n_other;
 	double zbar_old, zbar_other;
-	double w_temp, z_temp, wz_temp, w_bar;
+	double var_temp, w_temp, z_temp, wz_temp, w_bar;
 	int osp;
 
 	n_old = space[i][old].num[sp];
@@ -140,34 +140,38 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 	w_temp = 0;
 	z_temp = 0;
 
-	for (osp=0; osp<p->num_sp; osp++) /* each "other" species */
+	/* sum up the effects from each "other" species */
+	for (osp=0; osp<p->num_sp; osp++)
 	{
 		if (osp != sp)
 		{
 			zbar_other = space[i][old].zbar[osp];
 			n_other = space[i][old].num[osp];
 
+			var_temp = (p->V_p[sp] + p->V_p[osp] + p->V_u[sp] + p->V_u[osp]);
+
 			wz_temp = p->alpha[sp][osp] * n_other * 
-			            exp((-1 / (4 * (p->V_p + p->V_u))) * 
-			            pow(zbar_old - zbar_other, 2));
+					sqrt((p->V_u[sp] + p->V_u[osp]) / var_temp) * 
+					exp(-pow(zbar_old - zbar_other, 2) / (2 * var_temp));
+
 			w_temp += wz_temp;
-			z_temp += wz_temp * (zbar_old - zbar_other);
+			z_temp += wz_temp * (zbar_old - zbar_other) / var_temp;
 		}
 	}
 
-	/* contains terms for intraspecific and interspecific effects */
-	w_bar = p->r[sp] - pow(opt-zbar_old, 2)/(2*p->V_s[sp]) - p->V_p/(2*p->V_s[sp]) - 
-	       (p->r[sp]/p->K[sp]) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
-	       (p->alpha[sp][sp] * n_old + w_temp);
+	/* mean fitness: pop growth, stabilizing selection, inter- and intraspecific competition */
+	w_bar = p->r[sp] - (p->V_p[sp] + pow(opt - zbar_old, 2)) / ( 2 *p->V_s[sp])
+		-(p->r[sp] / p->K[sp]) * 
+			( w_temp +
+				p->alpha[sp][sp] * n_old * sqrt(p->V_u[sp] / (p->V_u[sp] + p->V_p[sp]))
+			);
 
 	/* population size changes */
 	nza_new[0] = exp(w_bar) * n_old;
 
 	/* mean breeding value changes */
-	nza_new[2] = space[i][old].abar[sp] + p->h2[sp] * p->V_p * (
-			(opt-zbar_old)/p->V_s[sp] + p->r[sp]/(2*p->K[sp]) * 
-			sqrt(p->V_u)/pow(p->V_p+p->V_u, 1.5) * z_temp
-			);
+	nza_new[2] = space[i][old].abar[sp] + p->h2[sp] * p->V_p[sp] * (
+		(opt - zbar_old) / p->V_s[sp] + p->r[sp] / p->K[sp] * z_temp );
 
 	/* mean phenotype will be set during development, which should occur
 	 * immediately after competition/reproduction */

@@ -42,8 +42,8 @@ typedef struct
 	Vector K;       /* carrying capacity, per cell                           */
 	Vector h2;      /* heritability, h^2                                     */
 	Vector V_s;     /* variance of stabilizing selection func, \sigma_s^2    */
-	double V_p;     /* variance of phenotypic distribution, \sigma_p^2       */
-	double V_u;     /* variance of competition function, \sigma_u^2          */
+	Vector V_p;     /* variance of phenotypic distribution, \sigma_p^2       */
+	Vector V_u;     /* variance of competition function, \sigma_u^2          */
 	Vector beta;    /* hybridization consideration                           */
 	Vector delta;   /* probability of dispersal into neighboring cell        */
 	const char *alpha_file;  /* file with matrix of competition coefficients */
