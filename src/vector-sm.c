@@ -95,3 +95,17 @@ void deleteVector(Vector v)
 	totalvectordata -= VectorSize(v);
 	g_free(v-1);
 }
+
+void printVector(const Vector v)
+{
+	int i, m;
+
+	m = VectorSize(v);
+
+	for(i = 0; i < m; i++)
+	{
+		if(i != 0) printf(" ");
+		printf("%e", v[i]);
+	}
+	printf("\n");
+}

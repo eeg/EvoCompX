@@ -91,7 +91,7 @@ void competition_happens(Cell space[][2], int old, Params *params)
 				comp_sel(nza_new, sp, i, opt, space, old, params);
 
 				/* hybridization changes numbers */
-				if (params->beta > 0)
+				if (params->beta[sp] > 0)
 				{
 					n_other = 0;
 					for (osp=0; osp<params->num_sp; osp++)
@@ -102,7 +102,7 @@ void competition_happens(Cell space[][2], int old, Params *params)
 						}
 					}
 					nza_new[0] = nza_new[0] * 
-							  n_old/(n_old + params->beta*n_other);
+							  n_old/(n_old + params->beta[sp]*n_other);
 				}
 			}
 			else            /* if the species is absent, nothing changes */
@@ -156,16 +156,16 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 	}
 
 	/* contains terms for intraspecific and interspecific effects */
-	w_bar = p->r[sp] - pow(opt-zbar_old, 2)/(2*p->V_s) - p->V_p/(2*p->V_s) - 
-	       (p->r[sp]/p->K) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
+	w_bar = p->r[sp] - pow(opt-zbar_old, 2)/(2*p->V_s[sp]) - p->V_p/(2*p->V_s[sp]) - 
+	       (p->r[sp]/p->K[sp]) * sqrt(p->V_u/(p->V_p+p->V_u)) * 
 	       (p->alpha[sp][sp] * n_old + w_temp);
 
 	/* population size changes */
 	nza_new[0] = exp(w_bar) * n_old;
 
 	/* mean breeding value changes */
-	nza_new[2] = space[i][old].abar[sp] + p->h2 * p->V_p * (
-			(opt-zbar_old)/p->V_s + p->r[sp]/(2*p->K) * 
+	nza_new[2] = space[i][old].abar[sp] + p->h2[sp] * p->V_p * (
+			(opt-zbar_old)/p->V_s[sp] + p->r[sp]/(2*p->K[sp]) * 
 			sqrt(p->V_u)/pow(p->V_p+p->V_u, 1.5) * z_temp
 			);
 

@@ -39,7 +39,7 @@ void development_happens(Cell space[][2], int old, Params *params)
 		for (sp=0; sp<params->num_sp; sp++)
 		{
 			space[i][old].zbar[sp] = space[i][old].abar[sp] + 
-			     params->bbar * get_environment(i, params->env_slope);
+			     params->bbar[sp] * get_environment(i, params->env_slope);
 			space[i][old].ztotal[sp] = space[i][old].num[sp] *
 			                           space[i][old].zbar[sp];
 		}

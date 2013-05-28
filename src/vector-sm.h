@@ -36,5 +36,6 @@ Vector newVector(int n);
 Vector newVectorfromstring(const char *str);
 int stringtoVector(const char *str, Vector v);
 void deleteVector(Vector v);
+void printVector(const Vector v);
 
 #endif

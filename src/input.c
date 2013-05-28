@@ -60,68 +60,51 @@ void FreeParams(Params *params)
 /*** read in the user's input parameter values ***/
 int AcquireParams(struct KeyValue *kv, Params *parameters)
 {
+	int nsp;
+
 	parameters->num_sp = getKeyValueint(kv, "num_species");
      if (parameters->num_sp == KV_INTERR)
 	{
 		fprintf(stderr, "need to specify number of species, num_species\n");
-		return -1;
+		return ERROR;
 	}
      if (parameters->num_sp < 2 || parameters->num_sp > MAX_NUM_SP)
 	{
 		fprintf(stderr, "need 2 <= num_species <= %d\n", MAX_NUM_SP);
-		return -1;
+		return ERROR;
 	}
+	nsp = parameters->num_sp;
 
 	/*** biology ***/
 
 	parameters->r = getKeyValueVector(kv, "r");
-     if (parameters->r == 0)
-	{
-		fprintf(stderr, "need to specify growth rate, r\n");
-		return -1;
-	}
-	if (VectorSize(parameters->r) != 1 && VectorSize(parameters->r) != parameters->num_sp)
-	{
-		fprintf(stderr, "invalid number of values for growth rate, r\n");
+	if (CheckParam(parameters->r, nsp, "growth rate, r") == ERROR)
 		return ERROR;
-	}
 
-	parameters->K = getKeyValuedouble(kv, "K");
-     if (parameters->K == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify carrying capacity, K\n");
-		return -1;
-	}
+	parameters->K = getKeyValueVector(kv, "K");
+	if (CheckParam(parameters->K, nsp, "carrying capacity, K") == ERROR)
+		return ERROR;
 
-	parameters->h2 = getKeyValuedouble(kv, "h2");
-     if (parameters->h2 == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify heritability, h2\n");
-		return -1;
-	}
-
-	parameters->V_s = getKeyValuedouble(kv, "V_s");
-     if (parameters->V_s == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify variance of stabilizing selection, "
-		        "V_s\n");
-		return -1;
-	}
+	parameters->h2 = getKeyValueVector(kv, "h2");
+	if (CheckParam(parameters->h2, nsp, "heritability, h2") == ERROR)
+		return ERROR;
 
 	parameters->V_p = getKeyValuedouble(kv, "V_p");
-     if (parameters->V_p == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify phenotypic variance, V_p\n");
-		return -1;
-	}
-
 	parameters->V_u = getKeyValuedouble(kv, "V_u");
-     if (parameters->V_u == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify variance of competition function, "
-		        "V_u\n");
-		return -1;
-	}
+
+	parameters->V_s = getKeyValueVector(kv, "V_s");
+	if (CheckParam(parameters->V_s, nsp, "variance of stabilizing selection, V_s") == ERROR)
+		return ERROR;
+
+/*
+	parameters->V_p = getKeyValueVector(kv, "V_p");
+	if (CheckParam(parameters->V_p, nsp, "phenotypic variance, V_p") == ERROR)
+		return ERROR;
+
+	parameters->V_u = getKeyValueVector(kv, "V_u");
+	if (CheckParam(parameters->V_u, nsp, "variance of competition function, V_u") == ERROR)
+		return ERROR;
+*/
 
 	parameters->alpha_file = getKeyValuestring(kv, "alpha_file");
      if (parameters->alpha_file == 0)
@@ -129,26 +112,25 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 		fprintf(stderr, "competition matrix not specified, using 1\n");
 	}
 
-	parameters->beta = getKeyValuedouble(kv, "beta");
-     if (parameters->beta == KV_FLOATERR)
+	parameters->beta = getKeyValueVector(kv, "beta");
+     if (parameters->beta == 0)
 	{
-		/* default is no hybridization */
-		parameters->beta = 0;
+		// default is no hybridization
+		parameters->beta[0] = 0;
+	}
+	else
+	{
+		if (CheckParam(parameters->beta, nsp, "hybridization consideration, beta") == ERROR)
+			return ERROR;
 	}
 
-	parameters->delta = getKeyValuedouble(kv, "delta");
-     if (parameters->delta == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify dispersal probability, delta\n");
-		return -1;
-	}
+	parameters->delta = getKeyValueVector(kv, "delta");
+	if (CheckParam(parameters->delta, nsp, "dispersal probability, delta") == ERROR)
+		return ERROR;
 
-	parameters->bbar = getKeyValuedouble(kv, "bbar");
-     if (parameters->bbar == KV_FLOATERR)
-	{
-		fprintf(stderr, "need to specify plasticity, bbar\n");
-		return -1;
-	}
+	parameters->bbar = getKeyValueVector(kv, "bbar");
+	if (CheckParam(parameters->bbar, nsp, "plasticity, bbar") == ERROR)
+		return ERROR;
 
 	/*** landscape ***/
 
@@ -237,7 +219,7 @@ Params *GetParams(int argc, char *argv[])
 	if (kv == 0)
 	{
 		fprintf(stderr, "unable to load parameters file\n");
-		exit(1);
+		exit(ERROR);
 	}
 
 	/* overwrite parameter values with those specified on the command line */
@@ -269,13 +251,33 @@ Params *GetParams(int argc, char *argv[])
 	{
 		fprintf(stderr, "unable to proceed -- "
 				"not all required parameters specified\n");
-		exit(1);
+		exit(ERROR);
 	}
 
 	/* convert any scalar parameters into a vector of length num_species */
 	VectorizeParams(parameters);
 
+	/*
+	PrintParams(parameters);
+	exit(ERROR); // XXX
+	*/
+
 	return parameters;
+}
+
+int CheckParam(Vector v, int nsp, const char *msg)
+{
+     if (v == 0)
+	{
+		fprintf(stderr, "need to specify %s\n", msg);
+		return ERROR;
+	}
+	if (VectorSize(v) != 1 && VectorSize(v) != nsp)
+	{
+		fprintf(stderr, "invalid number of values for %s\n", msg);
+		return ERROR;
+	}
+	return 0;
 }
 
 void VectorizeParams(Params *p)
@@ -283,9 +285,32 @@ void VectorizeParams(Params *p)
 	int nsp = p->num_sp;
 
 	if (VectorSize(p->r) == 1)
-	{
 		p->r = VecPar(p->r, nsp);
-	}
+
+	if (VectorSize(p->K) == 1)
+		p->K = VecPar(p->K, nsp);
+
+	if (VectorSize(p->h2) == 1)
+		p->h2 = VecPar(p->h2, nsp);
+	if (VectorSize(p->V_s) == 1)
+		p->V_s = VecPar(p->V_s, nsp);
+
+/*
+	if (VectorSize(p->V_p) == 1)
+		p->V_p = VecPar(p->V_p, nsp);
+
+	if (VectorSize(p->V_u) == 1)
+		p->V_u = VecPar(p->V_u, nsp);
+*/
+
+	if (VectorSize(p->beta) == 1)
+		p->beta = VecPar(p->beta, nsp);
+
+	if (VectorSize(p->delta) == 1)
+		p->delta = VecPar(p->delta, nsp);
+
+	if (VectorSize(p->bbar) == 1)
+		p->bbar = VecPar(p->bbar, nsp);
 }
 
 /* v has length 1, vn has length n */
@@ -305,3 +330,33 @@ Vector VecPar(Vector v, int n)
 
 	return (vn);
 }
+
+void PrintParams(Params *p)
+{
+	printf("num_sp = %d\n", p->num_sp);
+	printf("r = ");     printVector(p->r);
+	printf("K = ");     printVector(p->K);
+	printf("h2 = ");    printVector(p->h2);
+	printf("V_s = ");   printVector(p->V_s);
+/*
+	printf("V_p = ");   printVector(p->V_p);
+	printf("V_u = ");   printVector(p->V_u);
+*/
+	printf("beta = ");  printVector(p->beta);
+	printf("delta = "); printVector(p->delta);
+	printf("bbar = ");  printVector(p->bbar);
+}
+/*
+	const char *alpha_file;
+	double alpha[MAX_NUM_SP][MAX_NUM_SP];
+
+	int space_size;
+	double opt_slope;
+	double env_slope;
+	const char *initial_num;
+	const char *initial_abar;
+
+	int start_t;
+	int stop_t;
+	int record_interval;
+*/

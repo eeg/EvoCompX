@@ -74,21 +74,21 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 		}
 	}
 
-	if (params->delta > 0)
+	for (sp=0; sp<params->num_sp; sp++)
 	{
-		for (sp=0; sp<params->num_sp; sp++)
+		if (params->delta[sp] > 0)
 		{
 			/* nearest-neighbor dispersal for all cells except edges */
 			for (i=1; i<params->space_size-1; i++)
 			{
-				nearest_neighbor(space, old, i, i-1, params->delta, sp);
-				nearest_neighbor(space, old, i, i+1, params->delta, sp);
+				nearest_neighbor(space, old, i, i-1, params->delta[sp], sp);
+				nearest_neighbor(space, old, i, i+1, params->delta[sp], sp);
 			}
 
 			/* now the two edge cells */
-			nearest_neighbor(space, old, 0, 1, params->delta, sp);
+			nearest_neighbor(space, old, 0, 1, params->delta[sp], sp);
 			nearest_neighbor(space, old, params->space_size-1, 
-			                 params->space_size-2, params->delta, sp);
+			                 params->space_size-2, params->delta[sp], sp);
 
 
 			/* update mean phenotype, i.e. get zbar from ztotal; 

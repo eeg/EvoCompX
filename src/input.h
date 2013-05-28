@@ -39,16 +39,16 @@ typedef struct
 
 	/* biology */
 	Vector r;       /* growth rate                                           */
-	double K;       /* carrying capacity, per cell                           */
-	double h2;      /* heritability, h^2                                     */
-	double V_s;     /* variance of stabilizing selection func, \sigma_s^2    */
+	Vector K;       /* carrying capacity, per cell                           */
+	Vector h2;      /* heritability, h^2                                     */
+	Vector V_s;     /* variance of stabilizing selection func, \sigma_s^2    */
 	double V_p;     /* variance of phenotypic distribution, \sigma_p^2       */
 	double V_u;     /* variance of competition function, \sigma_u^2          */
-	double beta;    /* hybridization consideration                           */
-	double delta;   /* probability of dispersal into neighboring cell        */
+	Vector beta;    /* hybridization consideration                           */
+	Vector delta;   /* probability of dispersal into neighboring cell        */
 	const char *alpha_file;  /* file with matrix of competition coefficients */
 	double alpha[MAX_NUM_SP][MAX_NUM_SP];  /* the actual competition matrix  */
-	double bbar;    /* degree of plasticity                                  */
+	Vector bbar;    /* degree of plasticity                                  */
 
 	/* landscape */
 	int space_size;             /* number of cells, x (1-D)                  */
@@ -68,7 +68,9 @@ Params *NewParams();
 void FreeParams(Params *params);
 int AcquireParams(struct KeyValue *kv, Params *parameters);
 Params *GetParams(int argc, char *argv[]);
+int CheckParam(Vector v, int nsp, const char *msg);
 void VectorizeParams(Params *p);
 Vector VecPar(Vector v, int n);
+void PrintParams(Params *p);
 
 #endif
