@@ -115,6 +115,8 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 	parameters->beta = getKeyValueVector(kv, "beta");
      if (parameters->beta == 0)
 	{
+		/* default is no hybridization */
+		parameters->beta = newVector(1);
 		// default is no hybridization
 		parameters->beta[0] = 0;
 	}
