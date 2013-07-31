@@ -1,6 +1,3 @@
-Add support for input parameter vectors.
-    Using expanded keyvalue (gave up on libconfig)
-
 Replace tabs with 4 spaces.  (Change .vim, too.)
 
 Put fp_num, fp_zbar, fp_abar into a 2D array.
@@ -20,6 +17,7 @@ Make sure all the variance parameters are positive.
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
 
 If more species or cells are needed, malloc the space array.
+    Create a structure containing space, dimensions, and any other landscape parameters.
 
 Stop at equilibrium (define tol), rather than at pre-determined time.
 
@@ -30,7 +28,7 @@ relaxing weak competition assumption)
 [alpha matrix is done now]
 
 
-For packaging versions:
+For packaging versions (old):
 
 svn export under_svn/ dist/EvoCompX-v0.x
 cd dist/EvoCompX-v0.x

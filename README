@@ -58,9 +58,9 @@ initial_num, initial_zbar:  files with initial conditions
 Initial conditions can be completely arbitrary.  The file specified by
 initial_num should contain the initial abundances, with one column per species
 and one row per spatial cell.  Similarly for initial_zbar and the initial mean
-phenotypes.  These can be written by hand, or generated with the make_initial.py
-script included or any other script you want to write (e.g. randomly tossing
-individuals onto the landscape).
+phenotypes.  These can be written by hand, or generated with the
+make_initial.py or make_initial.R scripts included or any other script you want
+to write (e.g. randomly tossing individuals onto the landscape).
 
 To run the included three-species example:
 
