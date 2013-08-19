@@ -9,7 +9,7 @@ mycol <- c(myorange, mygreen, myblue, mypurple)
 # mv ../input/*.dat .
 # or make a simlink
 # setwd("../test/03-dispersal_first/")
-setwd("/home/emma/plastic-cd/EvoCompX/input/")
+# setwd("/home/emma/plastic-cd/EvoCompX/input/")
 
 # slopes of the environmental and optimum phenotype functions
 env.slope <- 1
@@ -86,6 +86,10 @@ dat.abar <- read.table("abar_final.dat")
 dat <- cbind(dat.num, dat.zbar, dat.abar)
 names(dat) <- paste(c(rep("num", nsp), rep("zbar", nsp), rep("abar", nsp)),
                     rep(as.character(seq(nsp)), 2), sep="")
+for (i in (nsp+1):ncol(dat))
+{
+    dat[which(dat[,i] < -999), i] <- NA
+}
 
 x <- seq(nrow(dat)) - 1
 
