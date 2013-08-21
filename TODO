@@ -4,6 +4,8 @@ Put fp_num, fp_zbar, fp_abar into a 2D array.
 
 Don't segfault if .in files are missing.
 
+Why are some generations much slower?  Happens late in some runs, when one or both species spreads far.
+
 Allow num_species = 1.
 
 Put in stuff for kinked or piecewise-linear optimum functions.
@@ -13,6 +15,7 @@ If command line options aren't valid variables, print a warning.
 Error checking/reporting for num_species and the contents of alpha_file, initial_num, and initial_zbar.
 
 Make sure all the variance parameters are positive.
+Make sure 0 <= delta <= 0.5.
 
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
 
