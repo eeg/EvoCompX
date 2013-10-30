@@ -49,11 +49,27 @@ Params *NewParams()
 	return p;
 }
 
-void FreeParams(Params *params)
+void FreeParams(Params *p)
 {
-	if (params->r != NULL)
-		deleteVector(params->r);
-	free(params);
+	if (p->r != NULL)
+		deleteVector(p->r);
+	if (p->K != NULL)
+		deleteVector(p->K);
+	if (p->h2 != NULL)
+		deleteVector(p->h2);
+	if (p->V_s != NULL)
+		deleteVector(p->V_s);
+	if (p->V_p != NULL)
+		deleteVector(p->V_p);
+	if (p->V_u != NULL)
+		deleteVector(p->V_u);
+	if (p->beta != NULL)
+		deleteVector(p->beta);
+	if (p->delta != NULL)
+		deleteVector(p->delta);
+	if (p->bbar != NULL)
+		deleteVector(p->bbar);
+	free(p);
 }
 
 
@@ -253,11 +269,6 @@ Params *GetParams(int argc, char *argv[])
 	/* convert any scalar parameters into a vector of length num_species */
 	VectorizeParams(parameters);
 
-	/*
-	PrintParams(parameters);
-	exit(ERROR); // XXX
-	*/
-
 	return parameters;
 }
 
@@ -282,27 +293,20 @@ void VectorizeParams(Params *p)
 
 	if (VectorSize(p->r) == 1)
 		p->r = VecPar(p->r, nsp);
-
 	if (VectorSize(p->K) == 1)
 		p->K = VecPar(p->K, nsp);
-
 	if (VectorSize(p->h2) == 1)
 		p->h2 = VecPar(p->h2, nsp);
 	if (VectorSize(p->V_s) == 1)
 		p->V_s = VecPar(p->V_s, nsp);
-
 	if (VectorSize(p->V_p) == 1)
 		p->V_p = VecPar(p->V_p, nsp);
-
 	if (VectorSize(p->V_u) == 1)
 		p->V_u = VecPar(p->V_u, nsp);
-
 	if (VectorSize(p->beta) == 1)
 		p->beta = VecPar(p->beta, nsp);
-
 	if (VectorSize(p->delta) == 1)
 		p->delta = VecPar(p->delta, nsp);
-
 	if (VectorSize(p->bbar) == 1)
 		p->bbar = VecPar(p->bbar, nsp);
 }
@@ -338,17 +342,3 @@ void PrintParams(Params *p)
 	printf("delta = "); printVector(p->delta);
 	printf("bbar = ");  printVector(p->bbar);
 }
-/*
-	const char *alpha_file;
-	double alpha[MAX_NUM_SP][MAX_NUM_SP];
-
-	int space_size;
-	double opt_slope;
-	double env_slope;
-	const char *initial_num;
-	const char *initial_abar;
-
-	int start_t;
-	int stop_t;
-	int record_interval;
-*/
