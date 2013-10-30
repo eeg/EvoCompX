@@ -61,6 +61,8 @@ typedef struct
 	int start_t;
 	int stop_t;
 	int record_interval;
+	int converge_interval;
+	double converge_tolerance;
 
 } Params;
 

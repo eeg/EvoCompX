@@ -1,4 +1,4 @@
-Stop at equilibrium (define tol over num_gen), rather than at pre-determined time.
+Use long int for stop_t and t_steps.
 
 Replace tabs with 4 spaces.  (Change .vim, too.)
 

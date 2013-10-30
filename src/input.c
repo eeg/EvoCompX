@@ -106,7 +106,8 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 		return ERROR;
 
 	p->V_s = getKeyValueVector(kv, "V_s");
-	if (CheckParam(p->V_s, nsp, "variance of stabilizing selection, V_s") == ERROR)
+	if (CheckParam(p->V_s, nsp, "variance of stabilizing selection, V_s") ==
+			ERROR)
 		return ERROR;
 
 	p->V_p = getKeyValueVector(kv, "V_p");
@@ -114,7 +115,8 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 		return ERROR;
 
 	p->V_u = getKeyValueVector(kv, "V_u");
-	if (CheckParam(p->V_u, nsp, "variance of competition function, V_u") == ERROR)
+	if (CheckParam(p->V_u, nsp, "variance of competition function, V_u") ==
+			ERROR)
 		return ERROR;
 
 	p->alpha_file = getKeyValuestring(kv, "alpha_file");
@@ -132,7 +134,8 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 	}
 	else
 	{
-		if (CheckParam(p->beta, nsp, "hybridization consideration, beta") == ERROR)
+		if (CheckParam(p->beta, nsp, "hybridization consideration, beta") ==
+				ERROR)
 			return ERROR;
 	}
 
@@ -174,7 +177,8 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 	p->initial_abar = getKeyValuestring(kv, "initial_abar");
      if (p->initial_abar == 0)
 	{
-		fprintf(stderr, "need to specify initial breeding values, initial_abar\n");
+		fprintf(stderr, "need to specify initial breeding values, "
+		                "initial_abar\n");
 		return -1;
 	}
 
@@ -188,18 +192,44 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 	}
 
 	p->stop_t = getKeyValueint(kv, "stop_t");
-     if (p->stop_t == KV_INTERR || p->stop_t < p->start_t)
+	p->converge_tolerance = getKeyValuedouble(kv, "converge_tolerance");
+     if ((p->stop_t == KV_INTERR || p->stop_t < p->start_t) &&
+	    (p->converge_tolerance == KV_FLOATERR || p->converge_tolerance <= 0))
 	{
-		fprintf(stderr, "valid stop_t not specified, using start_t + 1000\n");
+		fprintf(stderr, "valid stopping condition not specified, using "
+		          "stop_t = start_t + 1000 and converge_tolerance = 1e-6\n");
 		p->stop_t = p->start_t + 1000;
+		p->converge_tolerance = 1e-6;
+	}
+	else if (p->stop_t == KV_INTERR || p->stop_t < p->start_t)
+	{
+		fprintf(stderr, "valid stop_t not specified, using a large value "
+		                "(start_t + 1e8) to rely on converge_tolerance\n");
+		p->stop_t = p->start_t + 1e8;
+		/* to go larger than 2^32-1 (~10 digits) need a different data type */
+	}
+	else if (p->converge_tolerance == KV_FLOATERR || 
+	         p->converge_tolerance <= 0)
+	{
+		fprintf(stderr, "valid converge_tolerance not specified, using a "
+		                "strict value (1e-16) to rely on stop_t\n");
+		p->converge_tolerance = 1e-16;
 	}
 
 	p->record_interval = getKeyValueint(kv, "record_interval");
      if (p->record_interval == KV_INTERR || p->record_interval <= 0)
 	{
-		fprintf(stderr, "valid record_interval not specified, using elapsed "
-		                "time/10\n");
+		fprintf(stderr, "valid record_interval not specified, using (stop_t "
+		                "- start_t)/10\n");
 		p->record_interval = (p->stop_t - p->start_t)/10;
+	}
+
+	p->converge_interval = getKeyValueint(kv, "converge_interval");
+     if (p->converge_interval == KV_INTERR || p->converge_interval <= 0)
+	{
+		fprintf(stderr, "valid converge_interval not specified, using "
+		                "record_interval\n");
+		p->converge_interval = p->record_interval;
 	}
 
 	return 0;		/* returns -1 elsewhere if there's an error */

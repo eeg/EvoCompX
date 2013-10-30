@@ -33,7 +33,8 @@
 
 
 /*** replicate one copy of space, to be used to assess convergence with a time lag ***/
-void copy_converge_landscape(Cell space[][2], int old_new, Cell converge_space[], Params *params)
+void copy_converge_landscape(Cell space[][2], int old_new, Cell
+                             converge_space[], Params *params)
 {
 	int i, sp;
 
@@ -54,7 +55,8 @@ void copy_converge_landscape(Cell space[][2], int old_new, Cell converge_space[]
 
 
 /*** see how much num and abar have changed ***/
-double assess_convergence(Cell space[][2], int old_new, Cell converge_space[], Params *params)
+double assess_convergence(Cell space[][2], int old_new, Cell converge_space[],
+                          Params *params)
 {
 	double max_change = 0;
 	double change;

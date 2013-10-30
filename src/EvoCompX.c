@@ -65,10 +65,6 @@ int main(int argc, char *argv[])
 	int t_steps;
 	int recorded, converge;
 	double max_change;
-	/* FIXME temporary; should be in params */
-	double stop_tol;
-	int converge_interval;
-
 
 	/*** read in the parameters ***/
 
@@ -78,12 +74,8 @@ int main(int argc, char *argv[])
 	/* construct the matrix of competition coefficients */
 	make_alpha(params);
 
-	/* the number of generations to run */
+	/* the number of generations to allow */
 	t_steps = params->stop_t - params->start_t + 1;
-	/* FIXME temporary while testing stop_tol */
-	t_steps = 100000000;
-	stop_tol = 1e-12;
-	converge_interval = 100;
 
 	/*** prepare the output files ***/
 
@@ -100,8 +92,8 @@ int main(int argc, char *argv[])
 		fp_abar[sp] = fopen(str, "w");
 	}
 
-	recorded = 0;
-	converge = 0;
+	recorded = 0; /* for when to record results */
+	converge = 1; /* for when to assess convergence */
 
 	/*** clear the landscape and place initial individuals ***/
 
@@ -114,15 +106,15 @@ int main(int argc, char *argv[])
 	
 	/*** run the model: the generational loop ***/
 
-	/* for (t=0; t<t_steps; t++) */
 	t = 0;
 	max_change = 1; /* anything "large" */
 
-	while ((t < t_steps) & (max_change > stop_tol))
+	while ((t < t_steps) && (max_change > params->converge_tolerance))
 	{
 		/* plasticity/development */
 		development_happens(space, old, params);
-		/* the current state is still in old, but now complete with zbar and ztotal */
+		/* the current state is still in old, but now complete with zbar and
+		 * ztotal */
 
 		/* record the current state, if it's time to */
 		if (t == recorded * params->record_interval)
@@ -142,17 +134,15 @@ int main(int argc, char *argv[])
 		/* the updated state is now in old, ready for the next round */
 
 		/* assess convergence, if it's time to */
-		if (t == converge * converge_interval)
+		if (t == converge * params->converge_interval)
 		{
-			max_change = assess_convergence(space, old, converge_space, params);
-			printf("convergence = %e\n", max_change);
+			max_change = assess_convergence(space, old, converge_space,
+			                                params);
+			printf("convergence = %1.4e\n", max_change);
+			/* for next time: */
 			converge++;
-			copy_converge_landscape(space, old, converge_space, params); /* for next time */
+			copy_converge_landscape(space, old, converge_space, params);
 		}
-		/* NEW check if the results have converged */
-		/* might only do this at "record" intervals, but must let dispersal/competition happen first */
-		/* intentionally passing "old" as "new" -- see note after competition_happens */
-		/* max_change = check_convergence(space, old, params); */
 
 		t++;
 	}

@@ -33,6 +33,8 @@
 
 
 /*** write the abundances and mean phenotypes to output files ***/
+/*   (could instead open and close files here, so that intermediate results
+ *   get recorded) */
 void record_landscape(FILE **fp_num, FILE **fp_zbar, FILE **fp_abar, 
 		            Cell space[][2], Params *params, int old_new)
 {

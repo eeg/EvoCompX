@@ -107,7 +107,7 @@ struct KeyValue *loadKeyValue(const char *filename)
 	struct KeyValue *p;
 	FILE *in;
 	int i;
-	char str[1000], K[500], V[500]; //, dummy[500];
+	char str[1000], K[500], V[500];
 
 	if(strcmp(filename, "-") == 0) in = stdin;
 	else in = fopen(filename, "r");
@@ -137,8 +137,6 @@ struct KeyValue *loadKeyValue(const char *filename)
 		str[i+1] = 0;
 		if(str[0] == 0) continue;
 
-		/* if(sscanf(str, "%s %s %s\n", K, V, dummy) != 2) continue;
-		 * KeyValueupdateparm(p, K, V); */
 		/* allow space separating vector elements */
 		if(sscanf(str, "%s %n%s", K, &q, V) != 2) continue;
 		while(str[q] == ' ')

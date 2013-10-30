@@ -35,26 +35,36 @@ specified.  The notation mostly follows Case and Taper (2000).  Some of the
 parameters have default values, but for most of them, you'll get a warning
 message if any are unspecified.
 
-num_species:      need at least 2 species, and currently no more than 20
-r, K:             parameters of the logistic growth model
-h2:               heritability
-V_s, V_p, V_u:    variances of the stabilizing selection, phenotypic, and 
-                    competition functions
-alpha_file:       a file containing the matrix of competition coefficients,
-                    alpha[row i][col j] = alpha_ij = effect of j on i;
-                    values should be separated by whitespace
-beta:             frequency-independent hybridization
-delta:            probability of dispersal to a neighboring cell
-bbar:             plasticity (slope of reaction norm)
-space_size:       number of spatial cells, currently no more than 1000
-opt_slope:        the optimum phenotype function is currently a line with 0 
-                    intercept and this slope [theta(x)]
-start_t:          the starting time (useful to change if you want to continue a
-                    previous run)
-stop_t:           the stopping time; the number of time steps to be run is 
-                    stop_t - start_t
-record_interval:  after this many time steps, the results are written to files
+num_species:        need at least 2 species, and currently no more than 20
+r, K:               parameters of the logistic growth model
+h2:                 heritability
+V_s, V_p, V_u:      variances of the stabilizing selection, phenotypic, and 
+                      competition functions
+alpha_file:         a file containing the matrix of competition coefficients,
+                      alpha[row i][col j] = alpha_ij = effect of j on i;
+                      values should be separated by whitespace
+beta:               frequency-independent hybridization
+delta:              probability of dispersal to a neighboring cell
+bbar:               plasticity (slope of reaction norm)
+space_size:         number of spatial cells, currently no more than 1000
+opt_slope:          the optimum phenotype function is currently a line with 0 
+                      intercept and this slope [theta(x)]
+start_t:            the starting time (useful to change if you want to continue a
+                      previous run)
+stop_t:             stopping time; the maximum number of time steps to be run is
+                      stop_t - start_t
+converge_tolerance: maximum proportional change in num and abar at "equilibrium"
+record_interval:    after this many time steps, the results are written to files
+converge_interval:  after this many time steps, the results are checked for
+                      convergence
 initial_num, initial_abar:  files with initial conditions
+
+The run stops when either stop_t or converge_tolerance is reached.
+
+The biological parameters (r, K, h2, V_s, V_p, V_u, beta, delta, bbar) can each
+be either a single value---applied to all species---or one value per species.
+For the latter, separate the multiple values with a space (or any whitespace or
+punctuation?).
 
 Initial conditions can be completely arbitrary.  The file specified by
 initial_num should contain the initial abundances, with one column per species
@@ -90,7 +100,7 @@ You now have:
 As an example of how to visualize at the output, see output/plot_results.R:
    $ mv *.dat ../output/
    $ cd ../output/
-   $ R --no-save < plot_results.R
+   $ Rscript plot_results.R
 The file generated is results.pdf.
 
 
@@ -113,31 +123,27 @@ allocated dynamically.
 Here are some of the current limitations in the code.  All of these can be
 changed if that would be useful.
 
-(a) The value for a given parameter is the same for each species, e.g. all
-species have the same K.  FIXED: species-specific parameter values can now be
-specified.  
+(a) The value for a given parameter is the same everywhere in space.
 
-(b) The value for a given parameter is the same everywhere in space.
-
-(c) The maximum dispersal distance is one cell per generation.  I experimented
+(b) The maximum dispersal distance is one cell per generation.  I experimented
 with arbitrary dispersal kernels, but that got messy.  A simpler alternative is
 to let nearest-neighbor dispersal happen a specified number of times per
 generation.
 
-(d) Dispersal is symmetric: the probability of moving left is the same as the
+(c) Dispersal is symmetric: the probability of moving left is the same as the
 probability of moving right.
 
-(e) Competition is symmetric by phenotype.  To change that (e.g. so larger-z
+(d) Competition is symmetric by phenotype.  To change that (e.g. so larger-z
 individuals have a larger effect on smaller-z individuals than vice versa,
 regardless of their species), one could use a different competition 
 distribution (like Case and Taper's kappa).
 
-(f) The optimum phenotype function, theta(x), so far is just a straight line,
+(e) The optimum phenotype function, theta(x), so far is just a straight line,
 but it could be made into anything.  Modifications can be hard-coded in
 optimum.c, or a few general cases can be specified there and appropriate
 parameters created.
 
-(g) Selection must be weak, meaning that the cline can't be too steep,
+(f) Selection must be weak, meaning that the cline can't be too steep,
 dispersal too far, or the selection function too narrow.  Changing this
 requires obtaining the Wrightian fitness numerically rather than through the
 current analytical approximation.  This would slow the analysis down a bit, but
