@@ -74,105 +74,105 @@ void FreeParams(Params *p)
 
 
 /*** read in the user's input parameter values ***/
-int AcquireParams(struct KeyValue *kv, Params *parameters)
+int AcquireParams(struct KeyValue *kv, Params *p)
 {
 	int nsp;
 
-	parameters->num_sp = getKeyValueint(kv, "num_species");
-     if (parameters->num_sp == KV_INTERR)
+	p->num_sp = getKeyValueint(kv, "num_species");
+     if (p->num_sp == KV_INTERR)
 	{
 		fprintf(stderr, "need to specify number of species, num_species\n");
 		return ERROR;
 	}
-     if (parameters->num_sp < 2 || parameters->num_sp > MAX_NUM_SP)
+     if (p->num_sp < 2 || p->num_sp > MAX_NUM_SP)
 	{
 		fprintf(stderr, "need 2 <= num_species <= %d\n", MAX_NUM_SP);
 		return ERROR;
 	}
-	nsp = parameters->num_sp;
+	nsp = p->num_sp;
 
 	/*** biology ***/
 
-	parameters->r = getKeyValueVector(kv, "r");
-	if (CheckParam(parameters->r, nsp, "growth rate, r") == ERROR)
+	p->r = getKeyValueVector(kv, "r");
+	if (CheckParam(p->r, nsp, "growth rate, r") == ERROR)
 		return ERROR;
 
-	parameters->K = getKeyValueVector(kv, "K");
-	if (CheckParam(parameters->K, nsp, "carrying capacity, K") == ERROR)
+	p->K = getKeyValueVector(kv, "K");
+	if (CheckParam(p->K, nsp, "carrying capacity, K") == ERROR)
 		return ERROR;
 
-	parameters->h2 = getKeyValueVector(kv, "h2");
-	if (CheckParam(parameters->h2, nsp, "heritability, h2") == ERROR)
+	p->h2 = getKeyValueVector(kv, "h2");
+	if (CheckParam(p->h2, nsp, "heritability, h2") == ERROR)
 		return ERROR;
 
-	parameters->V_s = getKeyValueVector(kv, "V_s");
-	if (CheckParam(parameters->V_s, nsp, "variance of stabilizing selection, V_s") == ERROR)
+	p->V_s = getKeyValueVector(kv, "V_s");
+	if (CheckParam(p->V_s, nsp, "variance of stabilizing selection, V_s") == ERROR)
 		return ERROR;
 
-	parameters->V_p = getKeyValueVector(kv, "V_p");
-	if (CheckParam(parameters->V_p, nsp, "phenotypic variance, V_p") == ERROR)
+	p->V_p = getKeyValueVector(kv, "V_p");
+	if (CheckParam(p->V_p, nsp, "phenotypic variance, V_p") == ERROR)
 		return ERROR;
 
-	parameters->V_u = getKeyValueVector(kv, "V_u");
-	if (CheckParam(parameters->V_u, nsp, "variance of competition function, V_u") == ERROR)
+	p->V_u = getKeyValueVector(kv, "V_u");
+	if (CheckParam(p->V_u, nsp, "variance of competition function, V_u") == ERROR)
 		return ERROR;
 
-	parameters->alpha_file = getKeyValuestring(kv, "alpha_file");
-     if (parameters->alpha_file == 0)
+	p->alpha_file = getKeyValuestring(kv, "alpha_file");
+     if (p->alpha_file == 0)
 	{
 		fprintf(stderr, "competition matrix not specified, using 1\n");
 	}
 
-	parameters->beta = getKeyValueVector(kv, "beta");
-     if (parameters->beta == 0)
+	p->beta = getKeyValueVector(kv, "beta");
+     if (p->beta == 0)
 	{
 		/* default is no hybridization */
-		parameters->beta = newVector(1);
-		parameters->beta[0] = 0;
+		p->beta = newVector(1);
+		p->beta[0] = 0;
 	}
 	else
 	{
-		if (CheckParam(parameters->beta, nsp, "hybridization consideration, beta") == ERROR)
+		if (CheckParam(p->beta, nsp, "hybridization consideration, beta") == ERROR)
 			return ERROR;
 	}
 
-	parameters->delta = getKeyValueVector(kv, "delta");
-	if (CheckParam(parameters->delta, nsp, "dispersal probability, delta") == ERROR)
+	p->delta = getKeyValueVector(kv, "delta");
+	if (CheckParam(p->delta, nsp, "dispersal probability, delta") == ERROR)
 		return ERROR;
 
-	parameters->bbar = getKeyValueVector(kv, "bbar");
-	if (CheckParam(parameters->bbar, nsp, "plasticity, bbar") == ERROR)
+	p->bbar = getKeyValueVector(kv, "bbar");
+	if (CheckParam(p->bbar, nsp, "plasticity, bbar") == ERROR)
 		return ERROR;
 
 	/*** landscape ***/
 
-	parameters->space_size = getKeyValueint(kv, "space_size");
-     if (parameters->space_size == KV_INTERR || parameters->space_size < 1)
+	p->space_size = getKeyValueint(kv, "space_size");
+     if (p->space_size == KV_INTERR || p->space_size < 1)
 	{
 		fprintf(stderr, "valid space_size not specified, using 100\n");
-		parameters->space_size = 100;
+		p->space_size = 100;
 	}
 
-	parameters->opt_slope = getKeyValuedouble(kv, "opt_slope");
-     if (parameters->opt_slope == KV_FLOATERR)
+	p->opt_slope = getKeyValuedouble(kv, "opt_slope");
+     if (p->opt_slope == KV_FLOATERR)
 	{
 		fprintf(stderr, "need to specify slope of optimum phenotype, "
 			    "opt_slope\n");
 		return -1;
 	}
 
-	/* TODO need different slopes for theta and epsilon, i.e., B and C */
-	parameters->env_slope = 1;
+	/* TODO allow different slopes for theta and epsilon, i.e., B and C */
+	p->env_slope = 1;
 
-	parameters->initial_num = getKeyValuestring(kv, "initial_num");
-     if (parameters->initial_num == 0)
+	p->initial_num = getKeyValuestring(kv, "initial_num");
+     if (p->initial_num == 0)
 	{
 		fprintf(stderr, "need to specify initial abundances, initial_num\n");
 		return -1;
 	}
 
-	parameters->initial_abar = getKeyValuestring(kv, "initial_abar");
-     if (parameters->initial_abar == 0)
+	p->initial_abar = getKeyValuestring(kv, "initial_abar");
+     if (p->initial_abar == 0)
 	{
 		fprintf(stderr, "need to specify initial breeding values, initial_abar\n");
 		return -1;
@@ -180,29 +180,26 @@ int AcquireParams(struct KeyValue *kv, Params *parameters)
 
 	/*** record-keeping ***/
 
-	parameters->start_t = getKeyValueint(kv, "start_t");
-     if (parameters->start_t == KV_INTERR)
+	p->start_t = getKeyValueint(kv, "start_t");
+     if (p->start_t == KV_INTERR)
 	{
 		fprintf(stderr, "valid start_t not specified, using 0\n");
-		parameters->start_t = 0;
+		p->start_t = 0;
 	}
 
-	parameters->stop_t = getKeyValueint(kv, "stop_t");
-     if (parameters->stop_t == KV_INTERR || 
-	    parameters->stop_t < parameters->start_t)
+	p->stop_t = getKeyValueint(kv, "stop_t");
+     if (p->stop_t == KV_INTERR || p->stop_t < p->start_t)
 	{
 		fprintf(stderr, "valid stop_t not specified, using start_t + 1000\n");
-		parameters->stop_t = parameters->start_t + 1000;
+		p->stop_t = p->start_t + 1000;
 	}
 
-	parameters->record_interval = getKeyValueint(kv, "record_interval");
-     if (parameters->record_interval == KV_INTERR || 
-	    parameters->record_interval <= 0)
+	p->record_interval = getKeyValueint(kv, "record_interval");
+     if (p->record_interval == KV_INTERR || p->record_interval <= 0)
 	{
 		fprintf(stderr, "valid record_interval not specified, using elapsed "
 		                "time/10\n");
-		parameters->record_interval = 
-			(parameters->stop_t - parameters->start_t)/10;
+		p->record_interval = (p->stop_t - p->start_t)/10;
 	}
 
 	return 0;		/* returns -1 elsewhere if there's an error */
@@ -213,7 +210,7 @@ Params *GetParams(int argc, char *argv[])
 {
 	struct KeyValue *kv;
 	char k[100], v[100];
-	Params *parameters;
+	Params *p;
 	int i, j;
 
 	/* open the user's file */
@@ -226,7 +223,7 @@ Params *GetParams(int argc, char *argv[])
 		exit(1);
 	}
 
-	parameters = NewParams();
+	p = NewParams();
 	kv = loadKeyValue(argv[1]);
 	if (kv == 0)
 	{
@@ -259,7 +256,7 @@ Params *GetParams(int argc, char *argv[])
 		}
 	}
 
-	if (AcquireParams(kv, parameters) == -1)
+	if (AcquireParams(kv, p) == -1)
 	{
 		fprintf(stderr, "unable to proceed -- "
 				"not all required parameters specified\n");
@@ -267,9 +264,9 @@ Params *GetParams(int argc, char *argv[])
 	}
 
 	/* convert any scalar parameters into a vector of length num_species */
-	VectorizeParams(parameters);
+	VectorizeParams(p);
 
-	return parameters;
+	return p;
 }
 
 int CheckParam(Vector v, int nsp, const char *msg)
