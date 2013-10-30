@@ -1,13 +1,13 @@
 EvoCompX: evolution and competition across space
 
-Version 0.2, Sept 2009
-Emma Goldberg <eeg@umd.edu>
+Version 0.3, Oct 2013
+Emma Goldberg <eeg@uic.edu>
 
 This program implements the model of Case and Taper (2000, AmNat), with some
 extensions.  In particular, any number of species can be used, and competition
 coefficients can be specified.  The phenotype-independent hybridization from
-Goldberg and Lande (2006) is also included.  See the end of this file for major
-limitations.
+Goldberg and Lande (2006) is also included.  Now also constant (non-evolving)
+plasticity.  See the end of this file for major limitations.
 
 
 Step 1: Compile the program
@@ -45,6 +45,7 @@ alpha_file:       a file containing the matrix of competition coefficients,
                     values should be separated by whitespace
 beta:             frequency-independent hybridization
 delta:            probability of dispersal to a neighboring cell
+bbar:             plasticity (slope of reaction norm)
 space_size:       number of spatial cells, currently no more than 1000
 opt_slope:        the optimum phenotype function is currently a line with 0 
                     intercept and this slope [theta(x)]
@@ -53,12 +54,12 @@ start_t:          the starting time (useful to change if you want to continue a
 stop_t:           the stopping time; the number of time steps to be run is 
                     stop_t - start_t
 record_interval:  after this many time steps, the results are written to files
-initial_num, initial_zbar:  files with initial conditions
+initial_num, initial_abar:  files with initial conditions
 
 Initial conditions can be completely arbitrary.  The file specified by
 initial_num should contain the initial abundances, with one column per species
-and one row per spatial cell.  Similarly for initial_zbar and the initial mean
-phenotypes.  These can be written by hand, or generated with the
+and one row per spatial cell.  Similarly for initial_abar and the initial mean
+breeding values.  These can be written by hand, or generated with the
 make_initial.py or make_initial.R scripts included or any other script you want
 to write (e.g. randomly tossing individuals onto the landscape).
 
@@ -80,7 +81,9 @@ You now have:
    num1.dat, num2.dat, num3.dat: the abundances of each species at each location
       and each time of record; one line per time, one column per spatial cell
    zbar1.dat, zbar2.dat, zbar3.dat: same for the mean phenotypes of each species
-   num_final.dat, zbar_final.dat: the state of the system at the last time; the
+   abar1.dat, abar2.dat, abar3.dat: same for the mean breeding value of each
+      species
+   num_final.dat, abar_final.dat: the state of the system at the last time; the
       format of each file is the same as for the input files, so it is easy to
       continue runs
 
@@ -111,7 +114,8 @@ Here are some of the current limitations in the code.  All of these can be
 changed if that would be useful.
 
 (a) The value for a given parameter is the same for each species, e.g. all
-species have the same K.
+species have the same K.  FIXED: species-specific parameter values can now be
+specified.  
 
 (b) The value for a given parameter is the same everywhere in space.
 
