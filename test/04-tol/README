@@ -1,0 +1,7 @@
+Compare against code from 1495b4e317ea1c271971886206ac744edb35d589
+	results in orig/
+
+Three species.  Asymmetric competition matrix.  Nearest-neighbor dispersal.
+Some hybridization.  Some plasticity, which varies among species.
+
+Now stops slightly after orig/.  Results are identical, except for tiny changes in num_final.

@@ -90,7 +90,6 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 			nearest_neighbor(space, old, params->space_size-1, 
 			                 params->space_size-2, params->delta[sp], sp);
 
-
 			/* update mean phenotype, i.e. get zbar from ztotal; 
 			 * same for mean breeding value */
 			for (i=0; i<params->space_size; i++)

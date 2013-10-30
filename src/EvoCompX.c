@@ -36,6 +36,7 @@
 #include <glib.h>
 
 #include "compete.h"
+#include "converge.h"
 #include "develop.h"
 #include "dispersal.h"
 #include "landscape.h"
@@ -44,7 +45,6 @@
 #include "keyvalue.h"
 #include "input.h"
 
-
 int main(int argc, char *argv[])
 {
 	Params *params;
@@ -52,6 +52,8 @@ int main(int argc, char *argv[])
 	/* keep two copies of the space so events can happen simultaneously */
 	Cell space[MAX_SPACE_SIZE][2];
 	int old, new;
+	/* one more copy is for assessing convergence with a time lag */
+	Cell converge_space[MAX_SPACE_SIZE];
 
 	/* output files */
 	FILE *fp_time;
@@ -61,7 +63,11 @@ int main(int argc, char *argv[])
 	int i, t, sp;
 
 	int t_steps;
-	int recorded;
+	int recorded, converge;
+	double max_change;
+	/* FIXME temporary; should be in params */
+	double stop_tol;
+	int converge_interval;
 
 
 	/*** read in the parameters ***/
@@ -74,6 +80,10 @@ int main(int argc, char *argv[])
 
 	/* the number of generations to run */
 	t_steps = params->stop_t - params->start_t + 1;
+	/* FIXME temporary while testing stop_tol */
+	t_steps = 100000000;
+	stop_tol = 1e-12;
+	converge_interval = 100;
 
 	/*** prepare the output files ***/
 
@@ -91,10 +101,12 @@ int main(int argc, char *argv[])
 	}
 
 	recorded = 0;
+	converge = 0;
 
 	/*** clear the landscape and place initial individuals ***/
 
 	initialize_landscape(space, params);
+	copy_converge_landscape(space, 0, converge_space, params);
 
 	/* indices for the two copies of the landscape */
 	old = 0;	/* where individuals are at the start/end of each generation */
@@ -102,12 +114,15 @@ int main(int argc, char *argv[])
 	
 	/*** run the model: the generational loop ***/
 
-	for (t=0; t<t_steps; t++)
+	/* for (t=0; t<t_steps; t++) */
+	t = 0;
+	max_change = 1; /* anything "large" */
+
+	while ((t < t_steps) & (max_change > stop_tol))
 	{
 		/* plasticity/development */
 		development_happens(space, old, params);
-		/* the current state is still in old, but now complete with zbar 
- 		 * and ztotal */
+		/* the current state is still in old, but now complete with zbar and ztotal */
 
 		/* record the current state, if it's time to */
 		if (t == recorded * params->record_interval)
@@ -125,6 +140,21 @@ int main(int argc, char *argv[])
 		/* competition, stabilizing selection, hybridization */
 		competition_happens(space, new, params);
 		/* the updated state is now in old, ready for the next round */
+
+		/* assess convergence, if it's time to */
+		if (t == converge * converge_interval)
+		{
+			max_change = assess_convergence(space, old, converge_space, params);
+			printf("convergence = %e\n", max_change);
+			converge++;
+			copy_converge_landscape(space, old, converge_space, params); /* for next time */
+		}
+		/* NEW check if the results have converged */
+		/* might only do this at "record" intervals, but must let dispersal/competition happen first */
+		/* intentionally passing "old" as "new" -- see note after competition_happens */
+		/* max_change = check_convergence(space, old, params); */
+
+		t++;
 	}
 
 	/* got most of the results now */
