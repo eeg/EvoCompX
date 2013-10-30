@@ -9,6 +9,7 @@ test/*/abar?.dat
 test/*/time.dat
 test/*/*final.dat
 test/*/params.in
+test/temp*
 input/alpha.in
 input/num.in
 input/abar.in

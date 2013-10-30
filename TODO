@@ -1,3 +1,5 @@
+Stop at equilibrium (define tol over num_gen), rather than at pre-determined time.
+
 Replace tabs with 4 spaces.  (Change .vim, too.)
 
 Put fp_num, fp_zbar, fp_abar into a 2D array.
@@ -21,8 +23,6 @@ With 1 cell and delta > 0, can get num < 0: bring back TINY?
 
 If more species or cells are needed, malloc the space array.
     Create a structure containing space, dimensions, and any other landscape parameters.
-
-Stop at equilibrium (define tol), rather than at pre-determined time.
 
 Allow asymmetric competition (competition matrix or kappa) (should be okay as
 long as phenotype distribution and competition function are symmetric -- see
