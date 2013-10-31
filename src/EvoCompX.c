@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
 
 	int i, t, sp;
 
-	int t_steps;
+	long long int t_steps;
 	int recorded, converge;
 	double max_change;
 
@@ -119,10 +119,10 @@ int main(int argc, char *argv[])
 		/* record the current state, if it's time to */
 		if (t == recorded * params->record_interval)
 		{
-			fprintf(fp_time, "%d\n", t + params->start_t);
+			fprintf(fp_time, "%lld\n", t + params->start_t);
 			record_landscape(fp_num, fp_zbar, fp_abar, space, params, old);
 			recorded++;
-			printf("t = %d\n", t + params->start_t);
+			printf("t = %lld\n", t + params->start_t);
 		}
 
 		/* dispersal */

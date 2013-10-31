@@ -58,8 +58,9 @@ typedef struct
 	const char *initial_abar;   /* ...for n and abar                         */
 
 	/* record-keeping */
-	int start_t;
-	int stop_t;
+	long long int start_t;
+	long long int stop_t;
+	/* [long long allows larger than 2^32-1 (~10 digits)] */
 	int record_interval;
 	int converge_interval;
 	double converge_tolerance;

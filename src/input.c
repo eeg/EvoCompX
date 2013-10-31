@@ -184,14 +184,14 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 
 	/*** record-keeping ***/
 
-	p->start_t = getKeyValueint(kv, "start_t");
+	p->start_t = getKeyValuelonglongint(kv, "start_t");
      if (p->start_t == KV_INTERR)
 	{
 		fprintf(stderr, "valid start_t not specified, using 0\n");
 		p->start_t = 0;
 	}
 
-	p->stop_t = getKeyValueint(kv, "stop_t");
+	p->stop_t = getKeyValuelonglongint(kv, "stop_t");
 	p->converge_tolerance = getKeyValuedouble(kv, "converge_tolerance");
      if ((p->stop_t == KV_INTERR || p->stop_t < p->start_t) &&
 	    (p->converge_tolerance == KV_FLOATERR || p->converge_tolerance <= 0))
@@ -204,9 +204,8 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 	else if (p->stop_t == KV_INTERR || p->stop_t < p->start_t)
 	{
 		fprintf(stderr, "valid stop_t not specified, using a large value "
-		                "(start_t + 1e8) to rely on converge_tolerance\n");
-		p->stop_t = p->start_t + 1e8;
-		/* to go larger than 2^32-1 (~10 digits) need a different data type */
+		                "(start_t + 1e10) to rely on converge_tolerance\n");
+		p->stop_t = p->start_t + 1e10;
 	}
 	else if (p->converge_tolerance == KV_FLOATERR || 
 	         p->converge_tolerance <= 0)

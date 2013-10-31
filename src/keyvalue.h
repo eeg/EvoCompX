@@ -49,6 +49,7 @@ struct KeyValue *loadKeyValue(const char *filename);
 int saveKeyValue(const struct KeyValue *kv, const char *filename);
 int KeyValuekeyindex(const struct KeyValue *p, const char *key);
 int getKeyValueint(const struct KeyValue *p, const char *key);
+long long int getKeyValuelonglongint(const struct KeyValue *p, const char *key);
 double getKeyValuedouble(const struct KeyValue *p, const char *key);
 Vector getKeyValueVector(const struct KeyValue *p, const char *key);
 const char *getKeyValuestring(const struct KeyValue *p, const char *key);

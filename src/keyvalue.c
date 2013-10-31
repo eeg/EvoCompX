@@ -179,6 +179,14 @@ int KeyValuekeyindex(const struct KeyValue *p, const char *key)
 	return -1;
 }
 
+long long int getKeyValuelonglongint(const struct KeyValue *p, const char *key)
+{
+	int i = KeyValuekeyindex(p, key);
+
+	if(i < 0) return KV_INTERR;
+	return atoll(p->value[i]);
+}
+
 int getKeyValueint(const struct KeyValue *p, const char *key)
 {
 	int i = KeyValuekeyindex(p, key);
