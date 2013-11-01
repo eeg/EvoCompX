@@ -38,7 +38,7 @@
 #include "compete.h"
 #include "converge.h"
 #include "develop.h"
-#include "dispersal.h"
+#include "disperse.h"
 #include "landscape.h"
 #include "optimum.h"
 #include "vector-sm.h"

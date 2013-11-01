@@ -23,7 +23,7 @@
 #include <stdlib.h>
 
 #include "input.h"
-#include "dispersal.h"
+#include "disperse.h"
 
 
 /*** 
