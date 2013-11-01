@@ -18,6 +18,7 @@ Make sure all the variance parameters are positive.
 Make sure 0 <= delta <= 0.5.
 
 With 1 cell and delta > 0, can get num < 0: bring back TINY?
+    it's back---need to check single-cell results
 
 If more species or cells are needed, malloc the space array.
     Create a structure containing space, dimensions, and any other landscape parameters.

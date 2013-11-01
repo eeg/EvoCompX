@@ -33,7 +33,7 @@
 
 
 /* exchange between cells i and j, from the perspective of i 
- * adjusts num and ztotal, but not zbar */
+ * adjusts num and ztotal and atotal, but not zbar and abar */
 void nearest_neighbor(Cell space[][2], int old, int i, int j, 
                       double delta, int sp)
 {
@@ -94,8 +94,9 @@ void dispersal_happens(Cell space[][2], int old, Params *params)
 			 * same for mean breeding value */
 			for (i=0; i<params->space_size; i++)
 			{
-				if (space[i][new].num[sp] == 0)
+				if (space[i][new].num[sp] < TINY)
 				{
+					space[i][new].num[sp]  = 0;
 					space[i][new].zbar[sp] = UNDEF_PHEN;
 					space[i][new].abar[sp] = UNDEF_PHEN;
 				}
