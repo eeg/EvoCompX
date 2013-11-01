@@ -73,9 +73,9 @@ double assess_convergence(Cell space[][2], int old_new, Cell converge_space[],
 			num[1]  = space[i][old_new].num[sp];
 			abar[1] = space[i][old_new].abar[sp];
 
-			if (num[0] == 0)
+			if (num[0] < TINY)
 			{
-				if (num[1] == 0)
+				if (num[1] < TINY)
 					change = 0;
 				else
 					change = 1;

@@ -24,6 +24,9 @@
 /* for undefined mean phenotypes */
 #define UNDEF_PHEN -9999
 
+/* for near-zero abundances */
+#define TINY 1e-16
+
 #define MAX_NUM_SP 20
 #define MAX_SPACE_SIZE 1000
 
