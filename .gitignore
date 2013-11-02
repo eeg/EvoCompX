@@ -16,3 +16,4 @@ input/abar.in
 input/*.dat
 input/results.pdf
 test/*/results.pdf
+test/stuck*
