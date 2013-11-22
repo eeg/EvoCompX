@@ -4,7 +4,7 @@ OBJECTS = ${SOURCE:.c=.o}
 TARGETS = EvoCompX
 
 .PREFIXES = .c .o 
-CFLAGS = -Wall -g -O3 `pkg-config --cflags glib-2.0`
+CFLAGS = -Wall -g -O3 -mpc64 `pkg-config --cflags glib-2.0`
 LDFLAGS = `pkg-config --libs glib-2.0` -lm
 CC = gcc
 
