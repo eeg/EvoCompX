@@ -166,6 +166,9 @@ void comp_sel(double nza_new[3], int sp, int i, double opt, Cell space[][2],
 				p->alpha[sp][sp] * n_old * sqrt(p->V_u[sp] / (p->V_u[sp] + p->V_p[sp]))
 			);
 
+	/* seasonal load: constant fitness reduction
+	   w_bar -= (p->opt_slope * p->opt_slope) / (4 * p->V_s[sp]) * [S^2]; */
+
 	/* population size changes */
 	nza_new[0] = exp(w_bar) * n_old;
 
