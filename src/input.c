@@ -164,8 +164,12 @@ int AcquireParams(struct KeyValue *kv, Params *p)
 		return -1;
 	}
 
-	/* TODO allow different slopes for theta and epsilon, i.e., B and C */
-	p->env_slope = 1;
+	p->env_slope = getKeyValuedouble(kv, "env_slope");
+     if (p->env_slope == KV_FLOATERR)
+	{
+		fprintf(stderr, "slope of environment not specified, using 1\n");
+		p->env_slope = 1;
+	}
 
 	p->initial_num = getKeyValuestring(kv, "initial_num");
      if (p->initial_num == 0)

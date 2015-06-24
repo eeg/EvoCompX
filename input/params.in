@@ -30,7 +30,8 @@ bbar = 0.1
 ### landscape ###
 
 space_size = 100
-opt_slope = 0.5
+opt_slope = 0.5  # how physical environment maps to optimum phenotype, B * C
+env_slope = 1    # how physical environment changes over space, C
 
 # initial conditions
 # each of these files should have one column per species and one row per cell
