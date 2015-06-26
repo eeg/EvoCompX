@@ -44,3 +44,8 @@ initial_abar = abar.in
 record_interval = 500
 start_t = 0
 stop_t = 10000
+
+# or, decide to stop based on how the values are changing, rather than on a
+# pre-specified number of steps
+converge_interval = 1000      # defaults to record_interval
+converge_tolerance = 1e-08    # defaults to 1e-16
