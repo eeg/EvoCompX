@@ -1,13 +1,16 @@
 EvoCompX: evolution and competition across space
 
-Version 0.3, Oct 2013
-Emma Goldberg <eeg@uic.edu>
+Version 0.4, Jun 2015
+Emma Goldberg <eeg@umn.edu>
 
 This program implements the model of Case and Taper (2000, AmNat), with some
 extensions.  In particular, any number of species can be used, and competition
 coefficients can be specified.  The phenotype-independent hybridization from
 Goldberg and Lande (2006) is also included.  Now also constant (non-evolving)
-plasticity.  See the end of this file for major limitations.
+plasticity from Goldberg and Price (2021).
+
+Provided here are the full source code (src/) plus example helper scripts
+(input/ and output/ -- see Step 2 below).
 
 
 Step 1: Compile the program
@@ -17,7 +20,6 @@ On Linux/Unix-like systems, probably Mac OS X, and maybe Windows with cygwin,
 compilation from a terminal ($ is the prompt) is as simple as:
    $ cd src/
    $ make
-If you use an IDE or some other environment, you're on your own.
 
 As a first check, run the executable without any options:
    $ ./EvoCompX
@@ -63,8 +65,7 @@ The run stops when either stop_t or converge_tolerance is reached.
 
 The biological parameters (r, K, h2, V_s, V_p, V_u, beta, delta, bbar) can each
 be either a single value---applied to all species---or one value per species.
-For the latter, separate the multiple values with a space (or any whitespace or
-punctuation?).
+For the latter, separate the multiple values with a space.
 
 Initial conditions can be completely arbitrary.  The file specified by
 initial_num should contain the initial abundances, with one column per species
@@ -73,15 +74,13 @@ breeding values.  These can be written by hand, or generated with the
 make_initial.py or make_initial.R scripts included or any other script you want
 to write (e.g. randomly tossing individuals onto the landscape).
 
-To run the included three-species example:
+To run the included two-species example:
 
 Generate the initial condition files num.in and zbar.in:
-   $ ./make_initial.py
+   $ Rscript make_initial.R params.in
 
 Generate a file with a competition coefficient matrix, alpha.in:
-   $ ./make_alpha.py 0.5
-(If a number is specificed [0.5 here], that will be the value of all the a_ij
-elements.  If no number is given, random values will be chosen.)
+   $ python make_alpha.py 0.5
 
 Run the program, generating several output files:
    $ ../src/EvoCompX params.in
@@ -117,11 +116,10 @@ scenarios.  For example:
 
 Hugely increasing the number of species, number of spatial cells, or elapsed
 time could lead to slow run times.  So best to increase those just gradually.
-If more than 20 species or 1000 cells are needed, the space array must be
-allocated dynamically.
+If more than 20 species or 1000 cells are needed, the space array should
+instead be allocated dynamically.
 
-Here are some of the current limitations in the code.  All of these can be
-changed if that would be useful.
+Here are some of the current limitations in the code:
 
 (a) The value for a given parameter is the same everywhere in space.
 
@@ -146,14 +144,4 @@ parameters created.
 (f) Selection must be weak, meaning that the cline can't be too steep,
 dispersal too far, or the selection function too narrow.  Changing this
 requires obtaining the Wrightian fitness numerically rather than through the
-current analytical approximation.  This would slow the analysis down a bit, but
-it is probably worth doing.
-
-
-Disclaimer
----------------------------
-
-My older, two-species version of this code was well-tested and gave every
-indication of working properly.  I have only tested this multi-species version
-briefly -- it appears to work fine, but please keep an eye out for weird
-behavior (even with two species, since some of the code had to be re-written).
+current analytical approximation.

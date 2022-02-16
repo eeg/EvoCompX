@@ -17,18 +17,6 @@
  * along with EvoCompX.  If not, see <http://www.gnu.org/licenses/>.
  *********************************************************************/
 
-
-/***
-  * keep track of numbers and mean phenotypes of each of several species
-  * local adaptation
-  * density dependent growth (equal intra- and inter-specific competition)
-  * one-dimensional space
-  * discrete time
-  * nearest-neighbor dispersal (though could be repeated within a generation)
-  * no dispersal barriers
-***/
-
-
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
